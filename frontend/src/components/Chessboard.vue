@@ -1,6 +1,41 @@
 <script setup>
 import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
+import {onMounted} from "vue";
+
+let boardApi;
+
+// Client will only be able to play white pieces.
+const playerColor = 'white';
+
+// Moves into this match
+let moveCounter = 0;
+
+// Receive move from socket/server/etc here.
+function onReceiveMove(move) {
+  boardApi?.move(move);
+  moveCounter++;
+}
+
+// Checks playerColor onmount to rotate chessboard if necessary
+onMounted(() => {
+  playerColor !== "white" ? boardApi.toggleOrientation() : null ;
+});
+
+
+// Resets board
+function resetBoard() {
+  boardApi.resetBoard();
+}
+
+//undo last move if possible
+function undoLastMove() {
+  boardApi.undoLastMove();
+}
+
+
+
+
 </script>
 
 <template>
@@ -8,17 +43,18 @@ import 'vue3-chessboard/style.css';
   <div class="main-container">
 
     <div class="button-container button-container--settings">
-      <button class="button button--toggle-ai">Toggle AI</button>
+      <button class="button button--toggle-ai">Toggle AI <i class="bi bi-robot"></i> </button>
     </div>
 
     <div class="chessboard-container">
-      <TheChessboard />
+      <TheChessboard
+          @board-created="(api) => (boardApi = api)"
+      />
     </div>
 
     <div class="button-container button-container--options">
-      <button class="button button--reset">Zurücksetzen</button>
-      <button class="button button--undo">Zurück</button>
-      <button class="button button--forward">Weiter</button>
+      <button class="button button--reset" @click="resetBoard">Zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
+      <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
     </div>
   </div>
 </template>
@@ -63,7 +99,7 @@ import 'vue3-chessboard/style.css';
   border-radius: 10px;
 }
 
-/* BUTTON */
+/* BUTTONS */
 
 .button {
   border: none;
@@ -85,6 +121,10 @@ import 'vue3-chessboard/style.css';
 
 .button--reset {
   background-color: #f64040;
+}
+
+.button--dissabled {
+  background-color: rgb(128, 128, 128);
 }
 
 </style>
