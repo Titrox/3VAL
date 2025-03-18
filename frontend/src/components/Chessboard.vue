@@ -49,11 +49,12 @@ function undoLastMove() {
     <div class="chessboard-container">
       <TheChessboard
           @board-created="(api) => (boardApi = api)"
+          player-color="white"
       />
     </div>
 
     <div class="button-container button-container--options">
-      <button class="button button--reset" @click="resetBoard">Zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
+      <button class="button button--reset" @click="resetBoard">Brett zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
       <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
     </div>
   </div>

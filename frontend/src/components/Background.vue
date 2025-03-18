@@ -4,8 +4,6 @@
 
 <template>
 
-
-
   <div class="area" >
     <div class="content">
       <slot></slot>
@@ -119,7 +117,7 @@ body{
 }
 
 .circles li:nth-child(8){
-  left: 50%;
+  left: 10%;
   width: 25px;
   height: 25px;
   animation-delay: 15s;
