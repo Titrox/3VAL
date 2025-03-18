@@ -116,6 +116,8 @@ function undoLastMove() {
   transform: translateY(4px);
   box-shadow: none;
   cursor: pointer;
+
+  filter: brightness(90%);
 }
 
 
