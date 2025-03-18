@@ -60,16 +60,16 @@ body{
   list-style: none;
   width: 20px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.40);
+  background: rgba(255, 255, 255, 0.25);
   animation: animate 40s linear infinite;
   bottom: -150px;
 
 }
 
 .circles li:nth-child(1){
-  left: 0%;
-  width: 80px;
-  height: 80px;
+  left: 75%;
+  width: 40px;
+  height: 40px;
   animation-delay: 0s;
 }
 
@@ -105,7 +105,7 @@ body{
 }
 
 .circles li:nth-child(6){
-  left: 75%;
+  left: 20%;
   width: 110px;
   height: 110px;
   animation-delay: 20s;
@@ -139,7 +139,7 @@ body{
   width: 150px;
   height: 150px;
   animation-delay: 0s;
-  animation-duration: 11s;
+  animation-duration: 40s;
 }
 
 
