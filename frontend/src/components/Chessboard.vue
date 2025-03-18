@@ -70,8 +70,7 @@ function undoLastMove() {
   flex-direction: row;
 
   gap: 3vw;
-
-  background-color: #add39b;
+  z-index: 100;
 }
 
 

@@ -1,11 +1,14 @@
 <script setup>
 import Chessboard from "./components/Chessboard.vue";
+import Background from "./components/Background.vue";
 </script>
 
 <template>
-  <div class="main-container">
-    <Chessboard />
-  </div>
+  <Background>
+    <div class="main-container">
+      <Chessboard />
+    </div>
+  </Background>
 </template>
 
 <style scoped>
@@ -18,4 +21,5 @@ import Chessboard from "./components/Chessboard.vue";
   align-items: center;
   flex-direction: row;
 }
+
 </style>
