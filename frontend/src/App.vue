@@ -16,6 +16,9 @@ import Music from "./components/Music.vue";
 </template>
 
 <style scoped>
+
+/* CONTAINER */
+
 .main-container {
   height: 100vh;
   width: 100vw;

@@ -56,6 +56,7 @@ function undoLastMove() {
     <div class="button-container button-container--options">
       <button class="button button--reset" @click="resetBoard">Brett zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
       <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
+      <button class="button button-switch">Seite wechseln</button>
     </div>
   </div>
 </template>

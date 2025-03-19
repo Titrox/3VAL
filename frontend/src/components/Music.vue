@@ -6,7 +6,8 @@ audio.loop = true;
 const isPlaying = ref(false);
 
 
-const toggleMusic = () => {
+// Toggle Music depending on current isPlaying value
+function toggleMusic() {
   if (isPlaying.value) {
     audio.pause();
   } else {
@@ -14,6 +15,8 @@ const toggleMusic = () => {
   }
   isPlaying.value = !isPlaying.value;
 };
+
+
 
 
 </script>
