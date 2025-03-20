@@ -16,6 +16,7 @@ public class ChessMoveController {
     @PostMapping("/bestMove")
     public String getBestMove(@RequestBody String currentBoardState) {
 
-        return "test";
+        // TODO
+        return currentBoardState;
     }
 }

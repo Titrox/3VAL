@@ -18,7 +18,9 @@ function onReceiveMove(move) {
 
 // Play best move found by validation function
 async function playBestMove() {
-  let response = await axios.post('http://localhost:8080/bestMove', "test")
+  let response = await axios.post('http://localhost:8080/bestMove', boardApi.getFen())
+
+  // TODO
   console.log((response).data);
 }
 
