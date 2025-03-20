@@ -2,6 +2,7 @@
 import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
 import {onMounted, ref} from "vue";
+import axios from 'axios';
 
 let boardApi;
 
@@ -14,9 +15,17 @@ function onReceiveMove(move) {
   boardApi?.move(move);
 }
 
+
+// Play best move found by validation function
+async function playBestMove() {
+  let response = await axios.post('http://localhost:8080/bestMove', "test")
+  console.log((response).data);
+}
+
 // Checks playerColor onmount to rotate chessboard if necessary
 onMounted(() => {
   playerColor.value !== "white" ? boardApi.toggleOrientation() : null ;
+  playBestMove();
 });
 
 
