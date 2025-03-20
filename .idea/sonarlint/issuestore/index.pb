@@ -17,3 +17,7 @@ H
 python-service/script.py,6\d\6d96d75460021925db205958bbeba98d03775b67
 O
 python-service/requirements.txt,c\a\ca2a377bae66d9586918a4b1a39e0e91eeef4a23
+B
+docker-compose.yml,3\5\35b8c13cf2eb2a194eada000eb310d65aed53b2a
+L
+python-service/validation.py,2\d\2d95e09e9d3fb5096bf171b769ed67b5453ccef9
