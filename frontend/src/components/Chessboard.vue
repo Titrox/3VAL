@@ -1,31 +1,29 @@
 <script setup>
 import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
-import {onMounted} from "vue";
+import {onMounted, ref} from "vue";
 
 let boardApi;
 
 // Client will only be able to play white pieces.
-const playerColor = 'white';
+let playerColor = ref('white');
 
-// Moves into this match
-let moveCounter = 0;
 
 // Receive move from socket/server/etc here.
 function onReceiveMove(move) {
   boardApi?.move(move);
-  moveCounter++;
 }
 
 // Checks playerColor onmount to rotate chessboard if necessary
 onMounted(() => {
-  playerColor !== "white" ? boardApi.toggleOrientation() : null ;
+  playerColor.value !== "white" ? boardApi.toggleOrientation() : null ;
 });
 
 
 // Resets board
 function resetBoard() {
   boardApi.resetBoard();
+  playerColor.value = 'white';
 }
 
 //undo last move if possible
@@ -33,6 +31,11 @@ function undoLastMove() {
   boardApi.undoLastMove();
 }
 
+
+// Changes player side
+function togglePlayerColor() {
+  playerColor.value = playerColor.value === "white" ? "black" : "white";
+}
 
 
 
@@ -48,15 +51,23 @@ function undoLastMove() {
 
     <div class="chessboard-container">
       <TheChessboard
-          @board-created="(api) => (boardApi = api)"
-          player-color="white"
+          @board-created="(api) => {
+            boardApi = api;
+
+            if (playerColor === 'black') {
+              boardApi.toggleOrientation();
+            }
+          }"
+
+          :player-color="playerColor"
+          :key="playerColor"
       />
     </div>
 
     <div class="button-container button-container--options">
       <button class="button button--reset" @click="resetBoard">Brett zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
       <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
-      <button class="button button-switch">Seite wechseln</button>
+      <button class="button button-switch" @click="togglePlayerColor">Seite wechseln <i class="bi bi-arrow-left-right"></i></button>
     </div>
   </div>
 </template>
