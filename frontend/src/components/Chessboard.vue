@@ -1,7 +1,7 @@
 <script setup>
 import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import axios from 'axios';
 
 let boardApi;
@@ -45,7 +45,7 @@ function togglePlayerColor() {
 }
 
 
-
+// Check if it is AIs turn and play the best move found by validation function
 function handleMove() {
   if (boardApi?.getTurnColor() !== playerColor.value) {
     playBestMove();
@@ -70,7 +70,8 @@ function handleMove() {
 
             if (playerColor === 'black') {
               boardApi.toggleOrientation();
-            }
+              handleMove();
+            } 
           }"
 
           :player-color="playerColor"
