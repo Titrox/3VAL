@@ -18,17 +18,13 @@ function onReceiveMove(move) {
 
 // Play best move found by validation function
 async function playBestMove() {
-  let response = await axios.post('http://localhost:8080/best-move', boardApi.getFen())
-
-  // TODO
-  console.log((response).data);
+  try {
+    let response = await axios.post('http://localhost:8080/best-move', boardApi.getFen())
+    console.log((response).data);
+  } catch (e) {
+     console.error(e.message);
+  }
 }
-
-// Checks playerColor onmount to rotate chessboard if necessary
-onMounted(() => {
-  playerColor.value !== "white" ? boardApi.toggleOrientation() : null ;
-  playBestMove();
-});
 
 
 // Resets board
@@ -48,6 +44,13 @@ function togglePlayerColor() {
   playerColor.value = playerColor.value === "white" ? "black" : "white";
 }
 
+
+
+function handleMove() {
+  if (boardApi?.getTurnColor() !== playerColor.value) {
+    playBestMove();
+  }
+}
 
 
 </script>
@@ -72,6 +75,7 @@ function togglePlayerColor() {
 
           :player-color="playerColor"
           :key="playerColor"
+          @move="handleMove()"
       />
     </div>
 
