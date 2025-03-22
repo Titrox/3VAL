@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,9 +25,18 @@ public class ChessMoveController {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response;
 
+
+
+
         try {
-            response = restTemplate.postForEntity(flask_url, currentBoardState, String.class);
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> requestEntity = new HttpEntity<>(currentBoardState, header);
+
+            response = restTemplate.postForEntity(flask_url, requestEntity, String.class);
+
             return response.getBody();
+
         } catch (Exception e) {
             System.err.println("Request failed: " + e.getMessage());
         }

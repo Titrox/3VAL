@@ -18,8 +18,14 @@ function onReceiveMove(move) {
 
 // Play best move found by validation function
 async function playBestMove() {
+
+  const request = {
+    fen: boardApi?.getFen(),
+    turn: boardApi?.getTurnColor()
+  }
+
   try {
-    let response = await axios.post('http://localhost:8080/best-move', boardApi.getFen())
+    let response = await axios.post('http://localhost:8080/best-move', request)
     console.log((response).data);
   } catch (e) {
      console.error(e.message);
@@ -71,10 +77,10 @@ function handleMove() {
             if (playerColor === 'black') {
               boardApi.toggleOrientation();
               handleMove();
-            } 
+            }
           }"
 
-          :player-color="playerColor"
+          player-color="both"
           :key="playerColor"
           @move="handleMove()"
       />
