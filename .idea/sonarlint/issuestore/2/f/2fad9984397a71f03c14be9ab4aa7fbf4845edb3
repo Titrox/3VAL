@@ -1,3 +1,2 @@
 
-–	java:S116"TRename this field "flask_url" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÅƒÖ€8ÿÇñìÛ2J$42639b47-e9fa-4d92-bbdb-d526b30f7414
-r	java:S106)"+Replace this use of System.err by a logger.(ñ¶èôşÿÿÿÿ8‰ÈñìÛ2J$d9a5e53c-1004-48bb-9853-3b7f8a748d62
+r	java:S106("+Replace this use of System.err by a logger.(ñ¶èôşÿÿÿÿ8‰ÈñìÛ2J$6252f56c-a2bc-471f-81c5-d7904b4f2bbc
