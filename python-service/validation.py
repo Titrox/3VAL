@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
-from enum import IntEnum
-import numpy as np
+from enum import IntEnum 
 import urllib.parse
 import logging
 import constants
@@ -22,14 +21,13 @@ def getBestMove():
     received_fen = data["fen"]  # String has to be decoded -> String recieved as Bytes
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
-    value = calcPieceValueWithPSQT(formatted_fen, data["turn"] == "white") # Calc current piece value of AIs pieces
-
+    value = calcPieceValueWithPSQT(formatted_fen) # Calc current piece value of AIs pieces
     return value  
 
 
 # TODO Need for whites_turn? Fix 
 
-def calcPieceValueWithPSQT(fem, whites_turn): # TODO incremental 
+def calcPieceValueWithPSQT(fem): # TODO incremental 
 
     value = 0
     logger.debug(fem)
@@ -43,6 +41,7 @@ def calcPieceValueWithPSQT(fem, whites_turn): # TODO incremental
             logger.debug(f"{char} : {getattr(Pieces, char, 0)} PSQRT: {psqtValue} Feld: {currentField} Value insgesamt: {getattr(Pieces, char, 0) + psqtValue}")
     
             currentField += 1 
+
         elif char.islower(): # Black
             psqtValue = getPsqtValue(currentField, char, False)
             value -= getattr(Pieces, char.upper(), 0) + psqtValue
@@ -63,13 +62,18 @@ def calcPieceValueWithPSQT(fem, whites_turn): # TODO incremental
 def getPsqtValue(field, piece, is_white):
 
     psqt = getPsqtTable(piece, is_white)
+    kingOrQueen = piece.upper() == "K" or piece.upper() == "Q"
 
-    if not is_white:
-        return psqt[63 - field]  # Korrektes Spiegeln für 8x8 Brett]
-
+        
+    if not is_white or kingOrQueen:  # Check if king or queen is currently evaluated to correctly access mirrored PSQT
+        return psqt[63 - field]  # Return mirrored value
+    else:
+         return psqt[field] # Else return 
+        
+        
 
     # logger.debug(psqt)
-    return psqt[field]
+   
 
     
 
@@ -86,12 +90,14 @@ def getPsqtTable(piece, is_white):
         case _: return -1  
 
 
+
 def getKingPsqt(is_white):
     if is_white:
         return constants.Psqt.KING_PSQT
     else:
         return constants.Psqt.KING_PSQT_BLACK
-    
+
+
 def getQueenPsqt(is_white):
     if is_white:
         return constants.Psqt.QUEEN_PSQT
