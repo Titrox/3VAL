@@ -21,6 +21,7 @@ async function playBestMove() {
 
   const request = {
     fen: boardApi?.getFen(),
+    is_white: boardApi?.getTurnColor() === "white"
   }
 
   try {

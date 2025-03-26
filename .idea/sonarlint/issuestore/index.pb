@@ -21,3 +21,5 @@ L
 python-service/validation.py,2\d\2d95e09e9d3fb5096bf171b769ed67b5453ccef9
 K
 python-service/constants.py,f\c\fc924b741926d49f4f945ce772ec842454f62bbd
+C
+frontend/index.html,a\1\a12b0e66474192f8cb9a2db83f26413a588dec1d

@@ -15,7 +15,7 @@ public class ChessMoveController {
     String flaskUrl = "http://localhost:5000/best-move";
 
     /**
-     * Returns best possible move found by validation function
+     * Returns best possible move found by engine
      *
      * @param currentBoardState current board state in FEN
      */
