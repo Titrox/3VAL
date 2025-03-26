@@ -23,8 +23,29 @@ def getBestMove():
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
     value = calcPieceValueWithPSQT(formatted_fen) # Calc current piece value of AIs pieces
-    generate_moves(formatted_fen, is_white)
+    logger.debug(generate_moves(formatted_fen, is_white))
     return value  
+
+
+# Convert FEN into 1D array for calculations
+def fen_to_array(fen):
+    
+    chessboard = [0] * 64
+    currentField = 0
+
+    for char in fen: 
+
+        if char.isalpha():
+            chessboard[currentField] = char
+            currentField += 1
+
+        elif char.isdigit():
+            currentField += int(char)
+
+        elif char == " ":
+            break
+
+    return chessboard
 
 
 # Return Piece-Value-Difference based of piece-value and PSQT 
@@ -59,6 +80,7 @@ def calcPieceValueWithPSQT(fen): # TODO incremental
     return str(value)
 
 
+
 # Return PSQT Value of given piece on given field
 def getPsqtValue(field, piece, is_white):
 
@@ -77,13 +99,14 @@ def getPsqtValue(field, piece, is_white):
 def getPsqtTable(piece, is_white):
     
     match piece.upper():
-        case 'Q': return getQueenPsqt(is_white)
+        case 'P': return constants.Psqt.PAWN_PSQT
         case 'R': return constants.Psqt.ROOK_PSQT
         case 'B': return constants.Psqt.BISHOP_PSQT
-        case 'P': return constants.Psqt.PAWN_PSQT
         case 'N': return constants.Psqt.KNIGHT_PSQT
+        case 'Q': return getQueenPsqt(is_white)
         case 'K': return getKingPsqt(is_white)
         case _: logger.error(f"no PSQT found for {piece}"); return -1  
+
 
 
 # Return white or black King-PSQT
@@ -92,6 +115,8 @@ def getKingPsqt(is_white):
         return constants.Psqt.KING_PSQT
     else:
         return constants.Psqt.KING_PSQT_BLACK
+
+
 
 # Return white or black Queen-PSQT
 def getQueenPsqt(is_white):
@@ -102,46 +127,60 @@ def getQueenPsqt(is_white):
 
 
 
+# Returns array of all possible moves for one side in given position
 def generate_moves(fen, is_white):
-    chessboard = fen_to_array(fen)
-
-    for i in range(63):
-        figure = chessboard[i]
-
-        if figure.upper() == "P":
-            return
-        elif figure.upper() == "R":
-            return
-        elif figure.upper() == "N":
-            return
-        elif figure.upper() == "B":
-            return
-        elif figure.upper() == "K":
-            return
-        elif figure.upper() == "Q":
-            return      
-        
-        
-        
-
-
-def fen_to_array(fen):
     
-    chessboard = [0] * 64
-    currentField = 0
+    chessboard = fen_to_array(fen)
+    possible_moves = []
 
-    for char in fen: 
-        if char.isalpha():
-            chessboard[currentField] = char
-            currentField += 1
+    for i in range(64):
+        piece = chessboard[i]
 
-        elif char.isdigit():
-            currentField += int(char)
+        if is_white:
 
-        elif char == " ":
-            break
+            match piece:
+                case 'P': possible_moves.append(pawn_moves(i, is_white))
+                case 'B': possible_moves.append(bishop_moves(i, is_white))
+                case 'N': possible_moves.append(knight_moves(i, is_white))
+                case 'R': possible_moves.append(rook_moves(i, is_white))
+                case 'Q': possible_moves.append(queen_moves(i, is_white))
+                case 'K': possible_moves.append(king_moves(i, is_white))
 
-    return chessboard
+        else: 
+
+            match piece:
+                case 'p': possible_moves.append(pawn_moves(i, is_white))
+                case 'b': possible_moves.append(bishop_moves(i, is_white))
+                case 'n': possible_moves.append(knight_moves(i, is_white))
+                case 'r': possible_moves.append(rook_moves(i, is_white))
+                case 'q': possible_moves.append(queen_moves(i, is_white))
+                case 'k': possible_moves.append(king_moves(i, is_white))
+
+    return possible_moves
+
+            
+
+# 
+def pawn_moves(field, is_white):
+    return f"pawn moves {field, is_white}"
+
+def bishop_moves(field, is_white):
+    return f"bishop move {field, is_white}"
+
+def knight_moves(field, is_white):
+    return f"knight move {field, is_white}"
+
+def rook_moves(field, is_white):
+    return f"rook move {field, is_white}"
+
+def queen_moves(field, is_white):
+    return f"queen move {field, is_white}"
+        
+def king_moves(field, is_white):
+    return f"king move {field, is_white}"
+        
+        
+
 
 
 if __name__ == "__main__":
