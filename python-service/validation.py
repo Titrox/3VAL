@@ -30,21 +30,29 @@ def getBestMove():
 # Convert FEN into 1D array for calculations
 def fen_to_array(fen):
     
-    chessboard = [0] * 64
-    currentField = 0
+    chessboard = [[0 for _ in range(8)] for _ in range(8)]
+
+    current_field = 0
+    current_row = 0
+    current_column = 0
+
 
     for char in fen: 
 
         if char.isalpha():
-            chessboard[currentField] = char
-            currentField += 1
+            current_row = current_field // 8
+            current_column = current_field % 8
+            chessboard[current_row][current_column] = char
+            current_field += 1
+           
 
         elif char.isdigit():
-            currentField += int(char)
+            current_field += int(char)
 
         elif char == " ":
             break
 
+    logger.debug(chessboard)
     return chessboard
 
 
@@ -133,8 +141,10 @@ def generate_moves(fen, is_white):
     chessboard = fen_to_array(fen)
     possible_moves = []
 
-    for i in range(64):
-        piece = chessboard[i]
+    for i in range(8):
+        for j in range(8):
+            
+            piece = chessboard[i][j]
 
         if is_white:
 
@@ -159,8 +169,7 @@ def generate_moves(fen, is_white):
     return possible_moves
 
             
-
-# 
+ 
 def pawn_moves(field, is_white):
     return f"pawn moves {field, is_white}"
 
