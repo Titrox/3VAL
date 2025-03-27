@@ -30,6 +30,7 @@ def getBestMove():
 # Convert FEN into 1D array for calculations
 def fen_to_array(fen):
     
+    # 2D Array 8x8
     chessboard = [[0 for _ in range(8)] for _ in range(8)]
 
     current_field = 0
@@ -143,50 +144,50 @@ def generate_moves(fen, is_white):
 
     for i in range(8):
         for j in range(8):
-            
+
             piece = chessboard[i][j]
 
-        if is_white:
+            if is_white:
 
-            match piece:
-                case 'P': possible_moves.append(pawn_moves(i, is_white))
-                case 'B': possible_moves.append(bishop_moves(i, is_white))
-                case 'N': possible_moves.append(knight_moves(i, is_white))
-                case 'R': possible_moves.append(rook_moves(i, is_white))
-                case 'Q': possible_moves.append(queen_moves(i, is_white))
-                case 'K': possible_moves.append(king_moves(i, is_white))
+                match piece:
+                    case 'P': possible_moves.append(pawn_moves(i, j, is_white))
+                    case 'B': possible_moves.append(bishop_moves(i, j, is_white))
+                    case 'N': possible_moves.append(knight_moves(i, j, is_white))
+                    case 'R': possible_moves.append(rook_moves(i,  j, is_white))
+                    case 'Q': possible_moves.append(queen_moves(i, j, is_white))
+                    case 'K': possible_moves.append(king_moves(i, j, is_white))
 
-        else: 
+            else: 
 
-            match piece:
-                case 'p': possible_moves.append(pawn_moves(i, is_white))
-                case 'b': possible_moves.append(bishop_moves(i, is_white))
-                case 'n': possible_moves.append(knight_moves(i, is_white))
-                case 'r': possible_moves.append(rook_moves(i, is_white))
-                case 'q': possible_moves.append(queen_moves(i, is_white))
-                case 'k': possible_moves.append(king_moves(i, is_white))
+                match piece:
+                    case 'p': possible_moves.append(pawn_moves(i, j, is_white))
+                    case 'b': possible_moves.append(bishop_moves(i, j, is_white))
+                    case 'n': possible_moves.append(knight_moves(i, j, is_white))
+                    case 'r': possible_moves.append(rook_moves(i, j, is_white))
+                    case 'q': possible_moves.append(queen_moves(i, j, is_white))
+                    case 'k': possible_moves.append(king_moves(i, j, is_white))
 
     return possible_moves
 
             
  
-def pawn_moves(field, is_white):
-    return f"pawn moves {field, is_white}"
+def pawn_moves(field_row, field_column, is_white):
+    return f"pawn moves {field_row, field_column, is_white}"
 
-def bishop_moves(field, is_white):
-    return f"bishop move {field, is_white}"
+def bishop_moves(field_row, field_column, is_white):
+    return f"bishop move {field_row, field_column, is_white}"
 
-def knight_moves(field, is_white):
-    return f"knight move {field, is_white}"
+def knight_moves(field_row, field_column, is_white):
+    return f"knight move {field_row, field_column, is_white}"
 
-def rook_moves(field, is_white):
-    return f"rook move {field, is_white}"
+def rook_moves(field_row, field_column, is_white):
+    return f"rook move {field_row, field_column, is_white}"
 
-def queen_moves(field, is_white):
-    return f"queen move {field, is_white}"
+def queen_moves(field_row, field_column, is_white):
+    return f"queen move {field_row, field_column, is_white}"
         
-def king_moves(field, is_white):
-    return f"king move {field, is_white}"
+def king_moves(field_row, field_column, is_white):
+    return f"king move {field_row, field_column, is_white}"
         
         
 
