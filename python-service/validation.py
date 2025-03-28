@@ -23,7 +23,7 @@ def getBestMove():
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
     value = calcPieceValueWithPSQT(formatted_fen) # Calc current piece value of AIs pieces
-    logger.debug(generate_moves(formatted_fen, is_white))
+    logger.debug(generate_moves(formatted_fen))
     return value  
 
 
@@ -136,58 +136,98 @@ def getQueenPsqt(is_white):
 
 
 
-# Returns array of all possible moves for one side in given position
-def generate_moves(fen, is_white):
+# Returns 2D array of all possible moves for black and white in given position
+# TODO Add TurnObject for en passent etc.
+def generate_moves(fen):
     
     chessboard = fen_to_array(fen)
-    possible_moves = []
+    moves = {} # Dic fpr all moves
 
     for i in range(8):
         for j in range(8):
 
             piece = chessboard[i][j]
 
-            if is_white:
+            if piece == 0:
+                continue
+                
+
+            if piece.isupper():
 
                 match piece:
-                    case 'P': possible_moves.append(pawn_moves(i, j, is_white))
-                    case 'B': possible_moves.append(bishop_moves(i, j, is_white))
-                    case 'N': possible_moves.append(knight_moves(i, j, is_white))
-                    case 'R': possible_moves.append(rook_moves(i,  j, is_white))
-                    case 'Q': possible_moves.append(queen_moves(i, j, is_white))
-                    case 'K': possible_moves.append(king_moves(i, j, is_white))
+                    case 'P': moves.setdefault((i, j),[]).append(pawn_moves(i, j, True, chessboard))
+                    case 'B': moves.setdefault((i, j),[]).append(bishop_moves(i, j, chessboard))
+                    case 'N': moves.setdefault((i, j),[]).append(knight_moves(i, j, chessboard))
+                    case 'R': moves.setdefault((i, j),[]).append(rook_moves(i,  j, chessboard))
+                    case 'Q': moves.setdefault((i, j),[]).append(queen_moves(i, j, chessboard))
+                    case 'K': moves.setdefault((i, j),[]).append(king_moves(i, j, chessboard))
 
             else: 
 
                 match piece:
-                    case 'p': possible_moves.append(pawn_moves(i, j, is_white))
-                    case 'b': possible_moves.append(bishop_moves(i, j, is_white))
-                    case 'n': possible_moves.append(knight_moves(i, j, is_white))
-                    case 'r': possible_moves.append(rook_moves(i, j, is_white))
-                    case 'q': possible_moves.append(queen_moves(i, j, is_white))
-                    case 'k': possible_moves.append(king_moves(i, j, is_white))
+                    case 'p': moves.setdefault((i, j),[]).append(pawn_moves(i, j, False, chessboard))
+                    case 'b': moves.setdefault((i, j),[]).append(bishop_moves(i, j, chessboard))
+                    case 'n': moves.setdefault((i, j),[]).append(knight_moves(i, j, chessboard))
+                    case 'r': moves.setdefault((i, j),[]).append(rook_moves(i, j, chessboard))
+                    case 'q': moves.setdefault((i, j),[]).append(queen_moves(i, j, chessboard))
+                    case 'k': moves.setdefault((i, j),[]).append(king_moves(i, j, chessboard))
 
+    return moves
+     
+ 
+
+# TODO en passent etc.
+def pawn_moves(field_row, field_column, is_white, chessboard):
+    possible_moves = []
+
+    logger.debug(f"Überprüfe Bauer auf Feld {field_row}, {field_column}")
+
+    if is_white:
+        forward_row = field_row - 1
+        start_row = 6
+        direction = -1  # Weiß zieht nach oben
+        enemy_piece = str.islower  # Schwarz ist klein
+    else:
+        forward_row = field_row + 1
+        start_row = 1
+        direction = 1  # Schwarz zieht nach unten
+        enemy_piece = str.isupper  # Weiß ist groß
+
+    # Ein Feld vorwärts, wenn frei
+    if chessboard[forward_row][field_column] == 0:
+        possible_moves.append((forward_row, field_column))
+
+        # Zwei Felder vorwärts, wenn Startposition und beide Felder frei
+        if field_row == start_row and chessboard[forward_row + direction][field_column] == 0:
+            possible_moves.append((forward_row + direction, field_column))
+
+    # Schlagzüge nach links und rechts prüfen
+    for side in [-1, 1]:  # -1 = links, +1 = rechts
+        new_column = field_column + side
+        if 0 <= new_column <= 7:  # Prüfen, ob innerhalb der Spielfeldgrenzen
+            target_piece = chessboard[forward_row][new_column]
+            if target_piece != 0 and enemy_piece(target_piece):  # Feindliche Figur dort?
+                possible_moves.append((forward_row, new_column))
+
+    
     return possible_moves
 
-            
- 
-def pawn_moves(field_row, field_column, is_white):
-    return f"pawn moves {field_row, field_column, is_white}"
 
-def bishop_moves(field_row, field_column, is_white):
-    return f"bishop move {field_row, field_column, is_white}"
 
-def knight_moves(field_row, field_column, is_white):
-    return f"knight move {field_row, field_column, is_white}"
+def bishop_moves(field_row, field_column, chessboard):
+    return #f"bishop move {field_row, field_column}"
 
-def rook_moves(field_row, field_column, is_white):
-    return f"rook move {field_row, field_column, is_white}"
+def knight_moves(field_row, field_column, chessboard):
+    return #f"knight move {field_row, field_column}"
 
-def queen_moves(field_row, field_column, is_white):
-    return f"queen move {field_row, field_column, is_white}"
+def rook_moves(field_row, field_column, chessboard):
+    return #f"rook move {field_row, field_column}"
+
+def queen_moves(field_row, field_column, chessboard):
+    return #f"queen move {field_row, field_column}"
         
-def king_moves(field_row, field_column, is_white):
-    return f"king move {field_row, field_column, is_white}"
+def king_moves(field_row, field_column, chessboard):
+    return #f"king move {field_row, field_column}"
         
         
 

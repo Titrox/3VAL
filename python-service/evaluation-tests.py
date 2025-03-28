@@ -4,7 +4,7 @@ import unittest
 
 
 # Test if Piece + PSQT Difference = 0 for equal positions
-class PsqtTests(unittest.TestCase):
+class Psqt_tests(unittest.TestCase):
 
     def test_case_1(self):
         self.assertEqual(int(validation.calcPieceValueWithPSQT("rnb1kbnr/p4ppp/3q4/1pppp3/3PPPP1/3Q4/PPP4P/RNB1KBNR b KQkq - 0 5")),0,)
@@ -24,7 +24,7 @@ class PsqtTests(unittest.TestCase):
 
 
 
-class chessboard_from_fen_tests(unittest.TestCase):
+class Chessboard_from_fen_tests(unittest.TestCase):
     
     def test_case_1(self):
         expected = [[0 for _ in range(8)] for _ in range(8)]
@@ -64,3 +64,9 @@ class chessboard_from_fen_tests(unittest.TestCase):
 
         result = validation.fen_to_array("r2qkb2/p1p1p1p1/2n1bn1r/1p1p1p1p/P1P1P1P1/R1NB1N2/1P1P1P1P/2BQK2R b Kkq - 7 8")
         self.assertEqual(expected, result)
+
+
+class Pawn_move_tests(unittest.TestCase):
+   
+    def test():
+        return
