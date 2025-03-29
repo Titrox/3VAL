@@ -156,7 +156,7 @@ def generate_moves(fen):
 
                 match piece:
                     case 'P': moves.setdefault((i, j),[]).append(pawn_moves(i, j, True, chessboard))
-                    case 'B': moves.setdefault((i, j),[]).append(bishop_moves(i, j, chessboard))
+                    case 'B': moves.setdefault((i, j),[]).append(bishop_moves(i, j, True, chessboard))
                     case 'N': moves.setdefault((i, j),[]).append(knight_moves(i, j, chessboard))
                     case 'R': moves.setdefault((i, j),[]).append(rook_moves(i,  j, True, chessboard))
                     case 'Q': moves.setdefault((i, j),[]).append(queen_moves(i, j, chessboard))
@@ -166,7 +166,7 @@ def generate_moves(fen):
 
                 match piece:
                     case 'p': moves.setdefault((i, j),[]).append(pawn_moves(i, j, False, chessboard))
-                    case 'b': moves.setdefault((i, j),[]).append(bishop_moves(i, j, chessboard))
+                    case 'b': moves.setdefault((i, j),[]).append(bishop_moves(i, j, True, chessboard))
                     case 'n': moves.setdefault((i, j),[]).append(knight_moves(i, j, chessboard))
                     case 'r': moves.setdefault((i, j),[]).append(rook_moves(i, j, True, chessboard))
                     case 'q': moves.setdefault((i, j),[]).append(queen_moves(i, j, chessboard))
@@ -212,17 +212,9 @@ def pawn_moves(field_row, field_column, is_white, chessboard):
 
 
 
-def bishop_moves(field_row, field_column, chessboard):
-    return #f"bishop move {field_row, field_column}"
+def bishop_moves(field_row, field_column, is_white, chessboard):
 
-
-def knight_moves(field_row, field_column, chessboard):
-    return #f"knight move {field_row, field_column}"
-
-
-def rook_moves(field_row, field_column, is_white, chessboard):
-
-    move_pattern = constants.Piece_moves.Rook
+    move_pattern = constants.Piece_moves.Bishop
     possible_moves = []
     logger.debug(chessboard)
 
@@ -245,6 +237,37 @@ def rook_moves(field_row, field_column, is_white, chessboard):
 
             else: # Eigene Figur blockiert Bewegung
                 logger.debug(f"Eigene Figur auf {row},{column}")
+                break
+
+    return possible_moves
+
+
+def knight_moves(field_row, field_column, chessboard):
+    return #f"knight move {field_row, field_column}"
+
+
+def rook_moves(field_row, field_column, is_white, chessboard):
+
+    move_pattern = constants.Piece_moves.Rook
+    possible_moves = []
+    logger.debug(chessboard)
+
+    for direction in move_pattern:
+        row, column = field_row, field_column  # Startposition
+
+        while in_bound(row + direction[0], column + direction[1]):
+
+            row += direction[0] # directioion[0] stores vertical movement
+            column += direction[1] # directioion[0] stores horizontal movement
+
+            if chessboard[row][column] == 0:
+                possible_moves.append((row, column))
+
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
+                possible_moves.append((row, column))
+                break  # Gegner blockiert weitere Bewegung
+
+            else: # Eigene Figur blockiert Bewegung
                 break
 
     return possible_moves
