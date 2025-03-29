@@ -114,3 +114,4 @@ class Piece_moves: # Pawn is handled seperatly / Queen = Rook + Bishop
     Bishop = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  # Läufer (diagonal)
     Rook = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # Turm (gerade)
     King = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # König (wie Dame, aber nur 1 Feld)
+    Queen = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)] # Queen 
