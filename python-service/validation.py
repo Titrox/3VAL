@@ -2,6 +2,7 @@ from flask import Flask, request
 import urllib.parse
 import logging
 import constants
+import copy
 
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s", force=True)
@@ -140,7 +141,7 @@ def getQueenPsqt(is_white):
 # TODO Add Turn_object for en passent etc.
 def generate_moves(chessboard, is_white):
     
-    moves = {} # Dic fpr all moves
+    moves = {} # Dic for all moves
 
     for i in range(8):
         for j in range(8):
@@ -154,32 +155,92 @@ def generate_moves(chessboard, is_white):
             if piece.isupper() and is_white:
 
                 match piece:
-                    case 'P': moves.setdefault((i, j),[]).append(pawn_moves(i, j, True, chessboard))
-                    case 'B': moves.setdefault((i, j),[]).append(bishop_moves(i, j, True, chessboard))
-                    case 'N': moves.setdefault((i, j),[]).append(knight_moves(i, j, True, chessboard))
-                    case 'R': moves.setdefault((i, j),[]).append(rook_moves(i,  j, True, chessboard))
-                    case 'Q': moves.setdefault((i, j),[]).append(queen_moves(i, j, True, chessboard))
-                    case 'K': moves.setdefault((i, j),[]).append(king_moves(i, j, True, chessboard))
+                    case 'P': moves.setdefault((i, j),[]).extend(pawn_moves(i, j, True, chessboard))
+                    case 'B': moves.setdefault((i, j),[]).extend(bishop_moves(i, j, True, chessboard))
+                    case 'N': moves.setdefault((i, j),[]).extend(knight_moves(i, j, True, chessboard))
+                    case 'R': moves.setdefault((i, j),[]).extend(rook_moves(i,  j, True, chessboard))
+                    case 'Q': moves.setdefault((i, j),[]).extend(queen_moves(i, j, True, chessboard))
+                    case 'K': moves.setdefault((i, j),[]).extend(king_moves(i, j, True, chessboard))
 
             elif piece.islower() and not is_white: 
 
                 match piece:
-                    case 'p': moves.setdefault((i, j),[]).append(pawn_moves(i, j, False, chessboard))
-                    case 'b': moves.setdefault((i, j),[]).append(bishop_moves(i, j, False, chessboard))
-                    case 'n': moves.setdefault((i, j),[]).append(knight_moves(i, j, False, chessboard))
-                    case 'r': moves.setdefault((i, j),[]).append(rook_moves(i, j, False, chessboard))
-                    case 'q': moves.setdefault((i, j),[]).append(queen_moves(i, j, False, chessboard))
-                    case 'k': moves.setdefault((i, j),[]).append(king_moves(i, j, False, chessboard))
+                    case 'p': moves.setdefault((i, j),[]).extend(pawn_moves(i, j, False, chessboard))
+                    case 'b': moves.setdefault((i, j),[]).extend(bishop_moves(i, j, False, chessboard))
+                    case 'n': moves.setdefault((i, j),[]).extend(knight_moves(i, j, False, chessboard))
+                    case 'r': moves.setdefault((i, j),[]).extend(rook_moves(i, j, False, chessboard))
+                    case 'q': moves.setdefault((i, j),[]).extend(queen_moves(i, j, False, chessboard))
+                    case 'k': moves.setdefault((i, j),[]).extend(king_moves(i, j, False, chessboard))
 
     return moves
      
 
 def generate_legal_moves(chessboard, is_white):
 
-    all_moves = generate_moves(chessboard, is_white) # Generate all possible moves
-    return all_moves
+    all_moves = generate_moves(chessboard, is_white) # Generate all possible moves for black or white (is_white)
+    legal_moves = {}
+    
+
+    for key, value in all_moves.items():
+        
+        if (len(value) != 0): 
+           
+            for move in value:
+
+                sim_chessboard = copy.deepcopy(chessboard) # Copy Chessboard
+
+                # logger.debug(f"Zug von {key} zu {move}")
+
+                piece = sim_chessboard[key[0]][key[1]] # Get current piece
+                sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
+                sim_chessboard[move[0]][move[1]] = piece
+                logger.debug(move)
+                
+                if not is_check(sim_chessboard, is_white):
+                    legal_moves.setdefault(key,[]).append((move[0], move[1]))
+                
+
+    return legal_moves
+
+
+
+
+def is_check(chessboard, is_white):
+
+    all_opponent_moves = generate_moves(chessboard, not is_white) # Return all possible moves of opponent
+    king_field = get_king_field(chessboard, is_white)
+
+    for key, value in all_opponent_moves.items():
+        
+        if (len(value) != 0): 
+           
+            for move in value:
+
+                if move == king_field:
+                    return True
+                
+    
+    return False
+
+                
 
  
+
+
+
+def get_king_field(chessboard, is_white):
+
+    for i in range(8):
+        for j in range(8):
+
+            if is_white and chessboard[i][j] == 'K':
+                return (i,j)
+
+            elif not is_white and chessboard[i][j] == 'k':
+                return (i,j) 
+
+    
+    
 
 # TODO en passent etc.
 def pawn_moves(field_row, field_column, is_white, chessboard):
