@@ -68,5 +68,343 @@ class Chessboard_from_fen_tests(unittest.TestCase):
 
 class Pawn_move_tests(unittest.TestCase):
    
-    def test():
-        return
+    def test_case_1(self): # All possible moves
+
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,'p',0,0,0],
+            [0,0,0,'P',0,'P',0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(2,4), (3,4), (2,3), (2,5)]
+
+        self.assertEqual(expected, validation.pawn_moves(1, 4, False, chessboard))
+
+
+    def test_case_2(self): # No takes possible
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,'p',0,0,0],
+            [0,0,0,'p',0,'p',0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(2,4), (3,4)]
+
+        self.assertEqual(expected, validation.pawn_moves(1, 4, False, chessboard))
+
+
+    def test_case_3(self): # Fully blocked
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,'p',0,0,0],
+            [0,0,0,'p','p','p',0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.pawn_moves(1, 4, False, chessboard))
+
+
+
+    def test_case_4(self): # Only takes
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,'p',0,0,0],
+            [0,0,0,'P','p','P',0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(2,3), (2,5)]
+
+        self.assertEqual(expected, validation.pawn_moves(1, 4, False, chessboard))
+
+
+class Knight_move_tests(unittest.TestCase):
+   
+    def test_case_1(self): # All possible moves
+
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,'n',0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(1, 2), (1, 4), (5, 2), (5, 4), (2, 1), (2, 5), (4, 1), (4, 5)]
+
+        self.assertEqual(expected, validation.knight_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_2(self): # Fully blocked
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,'p',0,'p',0,0,0],
+            [0,'p',0,0,0,'p',0,0],
+            [0,0,0,'n',0,0,0,0],
+            [0,'p',0,0,0,'p',0,0],
+            [0,0,'p',0,'p',0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.knight_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_3(self): # Only takes
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,'P',0,'P',0,0,0],
+            [0,'P',0,0,0,'P',0,0],
+            [0,0,0,'n',0,0,0,0],
+            [0,'P',0,0,0,'P',0,0],
+            [0,0,'P',0,'P',0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(1, 2), (1, 4), (5, 2), (5, 4), (2, 1), (2, 5), (4, 1), (4, 5)]
+
+        self.assertEqual(expected, validation.knight_moves(3, 3, False, chessboard))
+
+
+
+
+    def test_case_4(self): # Out of bound
+        
+        chessboard = [
+            ['n',0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(2, 1), (1, 2)]
+
+        self.assertEqual(expected, validation.knight_moves(0, 0, False, chessboard))
+
+
+class Queen_move_tests(unittest.TestCase):
+   
+    
+    def test_case_1(self): # All possible moves & out of bound
+
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,'q',0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [
+            (3, 2), (3, 1), (3, 0), (3, 4), (3, 5), (3, 6), (3, 7),
+            (2, 3), (1, 3), (0, 3), (4, 3), (5, 3), (6, 3), (7, 3),
+            (2, 2), (1, 1), (0, 0), (2, 4), (1, 5), (0, 6),
+            (4, 2), (5, 1), (6, 0), (4, 4), (5, 5), (6, 6), (7, 7)
+        ]
+
+
+        self.assertEqual(expected, validation.queen_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_2(self): # Fully blocked
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,'p','p','p',0,0,0],
+            [0,0,'p','q','p',0,0,0],
+            [0,0,'p','p','p',0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.queen_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_3(self): # Only takes
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,'P','P','P',0,0,0],
+            [0,0,'P','q','P',0,0,0],
+            [0,0,'P','P','P',0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(3, 2), (3, 4), (2, 3), (4, 3), (2, 2), (2, 4), (4, 2), (4, 4)]
+
+        self.assertEqual(expected, validation.queen_moves(3, 3, False, chessboard))
+
+
+class Bishop_move_tests(unittest.TestCase):
+   
+    
+    def test_case_1(self): # All possible moves & out of bound
+
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,'b',0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [
+            (2, 2), (1, 1), (0, 0), (2, 4), (1, 5), (0, 6),
+            (4, 2), (5, 1), (6, 0), (4, 4), (5, 5), (6, 6), (7, 7)
+        ]
+
+
+        self.assertEqual(expected, validation.bishop_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_2(self): # Fully blocked
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,'p','p','p',0,0,0],
+            [0,0,'p','q','p',0,0,0],
+            [0,0,'p','p','p',0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.bishop_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_3(self): # Only takes
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,'P',0,'P',0,0,0],
+            [0,0,0,'q',0,0,0,0],
+            [0,0,'P',0,'P',0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [(2, 2), (2, 4), (4, 2), (4, 4)]
+
+        self.assertEqual(expected, validation.bishop_moves(3, 3, False, chessboard))
+
+
+class Rook_move_tests(unittest.TestCase):
+   
+    
+    def test_case_1(self): # All possible moves & out of bound
+
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,'r',0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected = [
+            (3, 2), (3, 1), (3, 0), (3, 4), (3, 5), (3, 6), (3, 7),
+            (2, 3), (1, 3), (0, 3), (4, 3), (5, 3), (6, 3), (7, 3),
+        ]
+
+
+        self.assertEqual(expected, validation.rook_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_2(self): # Fully blocked
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,'p',0,0,0,0],
+            [0,0,'p','r','p',0,0,0],
+            [0,0,0,'p',0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+        ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.rook_moves(3, 3, False, chessboard))
+
+
+
+    def test_case_3(self): # Only takes
+        
+        chessboard = [
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,'P',0,0,0,0],
+            [0,0,'P','r','P',0,0,0],
+            [0,0,0,'P',0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0,0]
+        ]
+
+        expected =  [(3, 2), (3, 4), (2, 3), (4, 3)]
+
+        self.assertEqual(expected, validation.rook_moves(3, 3, False, chessboard))

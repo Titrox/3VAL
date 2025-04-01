@@ -22,8 +22,9 @@ def getBestMove():
     received_fen = data["fen"]  # String has to be decoded -> String recieved as Bytes
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
-    value = calcPieceValueWithPSQT(formatted_fen) # Calc current piece value of AIs pieces
-    logger.debug(generate_moves(formatted_fen))
+    chessboard = fen_to_array(formatted_fen)
+    value = calcPieceValueWithPSQT(formatted_fen) # Calc current Piece-value
+    logger.debug(generate_legal_moves(chessboard, is_white))
     return value  
 
 
@@ -53,7 +54,6 @@ def fen_to_array(fen):
         elif char == " ":
             break
 
-    logger.debug(chessboard)
     return chessboard
 
 
@@ -138,9 +138,8 @@ def getQueenPsqt(is_white):
 
 # Returns 2D array of all possible moves for black and white in given position
 # TODO Add Turn_object for en passent etc.
-def generate_moves(fen):
+def generate_moves(chessboard, is_white):
     
-    chessboard = fen_to_array(fen)
     moves = {} # Dic fpr all moves
 
     for i in range(8):
@@ -152,7 +151,7 @@ def generate_moves(fen):
                 continue
                 
 
-            if piece.isupper():
+            if piece.isupper() and is_white:
 
                 match piece:
                     case 'P': moves.setdefault((i, j),[]).append(pawn_moves(i, j, True, chessboard))
@@ -162,7 +161,7 @@ def generate_moves(fen):
                     case 'Q': moves.setdefault((i, j),[]).append(queen_moves(i, j, True, chessboard))
                     case 'K': moves.setdefault((i, j),[]).append(king_moves(i, j, True, chessboard))
 
-            else: 
+            elif piece.islower() and not is_white: 
 
                 match piece:
                     case 'p': moves.setdefault((i, j),[]).append(pawn_moves(i, j, False, chessboard))
@@ -174,6 +173,12 @@ def generate_moves(fen):
 
     return moves
      
+
+def generate_legal_moves(chessboard, is_white):
+
+    all_moves = generate_moves(chessboard, is_white) # Generate all possible moves
+    return all_moves
+
  
 
 # TODO en passent etc.
@@ -253,10 +258,9 @@ def knight_moves(field_row, field_column, is_white, chessboard):
             if chessboard[row][column] == 0:
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  #Gegner blockiert weitere Bewegung
                 possible_moves.append((row, column))
-                # Gegner blockiert weitere Bewegung
-
+                
             #else: # Eigene Figur blockiert Bewegung
             #   logger.debug(f"Knight blocked by own piece {row}, {column}")
 
@@ -307,8 +311,6 @@ def queen_moves(field_row, field_column, is_white, chessboard):
                 possible_moves.append((row, column))
 
             elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
-                logger.debug(chessboard[row][column])
-                logger.debug(is_enemy(is_white, chessboard[row][column]))
                 possible_moves.append((row, column))
                 break  # Gegner blockiert weitere Bewegung
 
@@ -331,16 +333,14 @@ def king_moves(field_row, field_column, is_white, chessboard):
             column += direction[1] # directioion[0] stores horizontal movement
 
             if chessboard[row][column] == 0:
-                logger.debug(f"King can move to {row}, {column}")
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]): # Gegner blockiert weitere Bewegung
                 possible_moves.append((row, column))
-                logger.debug(f"King can capture {row}, {column}")
-                  # Gegner blockiert weitere Bewegung
+                  
 
-            else: # Eigene Figur blockiert Bewegung
-                logger.debug(f"King blocked by own piece {row}, {column}")
+            #else: # Eigene Figur blockiert Bewegung
+             #   logger.debug(f"King blocked by own piece {row}, {column}")
                 
 
     return possible_moves
