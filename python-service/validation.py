@@ -189,8 +189,6 @@ def generate_legal_moves(chessboard, is_white):
 
                 sim_chessboard = copy.deepcopy(chessboard) # Copy Chessboard
 
-                # logger.debug(f"Zug von {key} zu {move}")
-
                 piece = sim_chessboard[key[0]][key[1]] # Get current piece
                 sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
                 sim_chessboard[move[0]][move[1]] = piece
