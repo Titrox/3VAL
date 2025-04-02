@@ -25,8 +25,11 @@ def getBestMove():
 
     chessboard = fen_to_array(formatted_fen)
     value = calcPieceValueWithPSQT(formatted_fen) # Calc current Piece-value
+    logger.debug(chessboard)
     logger.debug(generate_legal_moves(chessboard, is_white))
+
     return value  
+
 
 
 # Convert FEN into 1D array for calculations
@@ -56,6 +59,7 @@ def fen_to_array(fen):
             break
 
     return chessboard
+
 
 
 # Return Piece-Value-Difference based of piece-value and PSQT 
@@ -175,12 +179,12 @@ def generate_moves(chessboard, is_white):
     return moves
      
 
+
 def generate_legal_moves(chessboard, is_white):
 
     all_moves = generate_moves(chessboard, is_white) # Generate all possible moves for black or white (is_white)
     legal_moves = {}
     
-
     for key, value in all_moves.items():
         
         if (len(value) != 0): 
@@ -192,14 +196,12 @@ def generate_legal_moves(chessboard, is_white):
                 piece = sim_chessboard[key[0]][key[1]] # Get current piece
                 sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
                 sim_chessboard[move[0]][move[1]] = piece
-                logger.debug(move)
                 
-                if not is_check(sim_chessboard, is_white):
+                if not is_check(sim_chessboard, is_white): # Add legal move
                     legal_moves.setdefault(key,[]).append((move[0], move[1]))
                 
 
     return legal_moves
-
 
 
 
@@ -219,13 +221,10 @@ def is_check(chessboard, is_white):
                 
     
     return False
-
-                
-
+            
  
 
-
-
+# Returns Field
 def get_king_field(chessboard, is_white):
 
     for i in range(8):
@@ -236,10 +235,12 @@ def get_king_field(chessboard, is_white):
 
             elif not is_white and chessboard[i][j] == 'k':
                 return (i,j) 
+            
+        
+    return (-1,-1) # No King found
 
     
     
-
 # TODO en passent etc.
 def pawn_moves(field_row, field_column, is_white, chessboard):
     possible_moves = []
@@ -301,6 +302,7 @@ def bishop_moves(field_row, field_column, is_white, chessboard):
     return possible_moves
 
 
+
 def knight_moves(field_row, field_column, is_white, chessboard):
     
     move_pattern = constants.Piece_moves.Knight
@@ -324,6 +326,7 @@ def knight_moves(field_row, field_column, is_white, chessboard):
             #   logger.debug(f"Knight blocked by own piece {row}, {column}")
 
     return possible_moves
+
 
 
 def rook_moves(field_row, field_column, is_white, chessboard):
@@ -378,6 +381,8 @@ def queen_moves(field_row, field_column, is_white, chessboard):
 
     return possible_moves
         
+
+
 def king_moves(field_row, field_column, is_white, chessboard):
     
     move_pattern = constants.Piece_moves.King
@@ -404,13 +409,16 @@ def king_moves(field_row, field_column, is_white, chessboard):
 
     return possible_moves
         
-        
+
+
 def in_bound(row, column):
     return 0 <= row <= 7 and 0 <= column <= 7 
 
 
+
 def is_enemy(is_white, figure):
     return str.islower(figure) if is_white else str.isupper(figure)
+
 
 
 if __name__ == "__main__":
