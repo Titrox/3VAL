@@ -2,6 +2,7 @@ from flask import Flask, request
 import urllib.parse
 import logging
 import constants
+import searchfunction
 import copy
 
 
@@ -24,12 +25,21 @@ def getBestMove():
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
     chessboard = fen_to_array(formatted_fen)
-    value = calcPieceValueWithPSQT(formatted_fen) # Calc current Piece-value
+    
     logger.debug(chessboard)
+    searchfunction.counter = 0
+    value = str(searchfunction.MINIMAX(chessboard, 2, is_white))
     logger.debug(generate_legal_moves(chessboard, is_white))
 
     return value  
 
+
+def evaluate_position(chessboard):
+
+    value = 0
+    value += calc_piece_value_with_psqt(chessboard)
+
+    return value
 
 
 # Convert FEN into 1D array for calculations
@@ -63,35 +73,42 @@ def fen_to_array(fen):
 
 
 # Return Piece-Value-Difference based of piece-value and PSQT 
-def calcPieceValueWithPSQT(fen): # TODO incremental 
+def calc_piece_value_with_psqt(chessboard): # TODO incremental 
 
     value = 0
     # logger.debug(fen)
     currentField = 0
 
-    for char in fen: 
-        if char.isupper(): # White
-            psqtValue = getPsqtValue(currentField, char, True)
-            value += getattr(Pieces, char, 0) + psqtValue
+    for i in range(8): 
 
-            # logger.debug(f"{char} : {getattr(Pieces, char, 0)} PSQRT: {psqtValue} Feld: {currentField} Value insgesamt: {getattr(Pieces, char, 0) + psqtValue}")
-    
-            currentField += 1 
+        for j in range(8):
 
-        elif char.islower(): # Black
-            psqtValue = getPsqtValue(currentField, char, False)
-            value -= getattr(Pieces, char.upper(), 0) + psqtValue
+            char = chessboard[i][j]
+
+
+            if char == 0:
+                currentField += 1
+
+
+            elif char.isupper(): # White
+                psqtValue = getPsqtValue(currentField, char, True)
+                value += getattr(Pieces, char, 0) + psqtValue
+
+                currentField += 1 
+
+
+            elif char.islower(): # Black
+                psqtValue = getPsqtValue(currentField, char, False)
+                value -= getattr(Pieces, char.upper(), 0) + psqtValue
             
-            # logger.debug(f"{char} : {getattr(Pieces, char.upper(), 0)} PSQRT: {psqtValue} Feld: {currentField} Value insgesamt: {getattr(Pieces, char.upper(), 0) + psqtValue}")
+                currentField += 1
+
             
-            currentField += 1
-        elif char.isdigit():
-            currentField += int(char)
-        if char == ' ':
-            break
+            if char == ' ':
+                break
             
         # logger.debug(value)
-    return str(value)
+    return value
 
 
 
@@ -141,7 +158,7 @@ def getQueenPsqt(is_white):
 
 
 
-# Returns 2D array of all possible moves for black and white in given position
+# Returns 2D array of all possible moves for black or white for given position
 # TODO Add Turn_object for en passent etc.
 def generate_moves(chessboard, is_white):
     
@@ -191,11 +208,8 @@ def generate_legal_moves(chessboard, is_white):
            
             for move in value:
 
-                sim_chessboard = copy.deepcopy(chessboard) # Copy Chessboard
+                sim_chessboard = make_move(key, move, chessboard) # Simulate move
 
-                piece = sim_chessboard[key[0]][key[1]] # Get current piece
-                sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
-                sim_chessboard[move[0]][move[1]] = piece
                 
                 if not is_check(sim_chessboard, is_white): # Add legal move
                     legal_moves.setdefault(key,[]).append((move[0], move[1]))
@@ -205,24 +219,45 @@ def generate_legal_moves(chessboard, is_white):
 
 
 
+def make_move(key, move, chessboard): 
+
+    sim_chessboard = copy.deepcopy(chessboard) # Copy Chessboard
+
+    piece = sim_chessboard[key[0]][key[1]] # Get current piece
+    sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
+    sim_chessboard[move[0]][move[1]] = piece
+    
+    return sim_chessboard
+
+
+
 def is_check(chessboard, is_white):
 
     all_opponent_moves = generate_moves(chessboard, not is_white) # Return all possible moves of opponent
     king_field = get_king_field(chessboard, is_white)
 
-    for key, value in all_opponent_moves.items():
+    for key, value in all_opponent_moves.items(): # Iterate trough all moves
         
         if (len(value) != 0): 
            
-            for move in value:
+            for move in value: 
 
-                if move == king_field:
+                if move == king_field: # King is attacked -> check
                     return True
                 
     
-    return False
+    return False # King is not attacked
             
  
+
+
+def game_over(chessboard, is_white):
+
+    legal_moves = len(generate_legal_moves(chessboard, is_white)) 
+    return False if legal_moves != 0 else True
+
+
+    
 
 # Returns Field
 def get_king_field(chessboard, is_white):

@@ -1,0 +1,4 @@
+
+xpython:S117"ZRename this local variable "bestValue" to match the regular expression ^[_a-z][a-z0-9_]*$.(œíõ¾8Ø†¸¶ß2
+qpython:S1542"MRename function "MINIMAX" to match the regular expression ^[a-z_][a-z0-9_]*$.(øÍŽëÿÿÿÿÿ8Þ†¸¶ß2
+gpython:S930"DAdd 1 missing arguments; 'game_over' expects 2 positional arguments.(óÕôöûÿÿÿÿ8ã‡¸¶ß2
