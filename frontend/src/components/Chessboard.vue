@@ -12,7 +12,9 @@ let playerColor = ref('white');
 
 // Receive move from socket/server/etc here.
 function onReceiveMove(move) {
-  boardApi?.move(move);
+  console.log(boardApi?.move(move))
+
+  console.log(move);
 }
 
 
@@ -26,7 +28,9 @@ async function playBestMove() {
 
   try {
     let response = await axios.post('http://localhost:8080/best-move', request)
-    console.log((response).data);
+    const move = response.data
+    console.log(move)
+    onReceiveMove(move);
   } catch (e) {
      console.error(e.message);
   }
@@ -80,7 +84,7 @@ function handleMove() {
             }
           }"
 
-          player-color="both"
+          :player-color="playerColor"
           :key="playerColor"
           @move="handleMove()"
       />

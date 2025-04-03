@@ -15,7 +15,7 @@ Pieces = constants.Pieces
 
 
 @app.route('/best-move', methods=['POST'])
-def getBestMove():
+def get_best_move():
         
     data = request.get_json()
 
@@ -25,13 +25,17 @@ def getBestMove():
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
     chessboard = fen_to_array(formatted_fen)
-    
     logger.debug(chessboard)
-    searchfunction.counter = 0
-    value = str(searchfunction.MINIMAX(chessboard, 2, is_white))
+
+    searchfunction.counter = 0 # Reset Counter
+
+    best_move = searchfunction.MINIMAX(chessboard, 2, is_white, searchfunction.Move(0,0))
+    logger.debug(best_move.to_dict)
+
+
     logger.debug(generate_legal_moves(chessboard, is_white))
 
-    return value  
+    return best_move.to_dict() # Return best move
 
 
 def evaluate_position(chessboard):

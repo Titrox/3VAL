@@ -23,7 +23,3 @@ K
 python-service/constants.py,f\c\fc924b741926d49f4f945ce772ec842454f62bbd
 C
 frontend/index.html,a\1\a12b0e66474192f8cb9a2db83f26413a588dec1d
-Q
-!python-service/search_function.py,d\3\d36a0f9906f06e6015ea564e304cbc5f450d1b9e
-Q
-!python-service/search-function.py,d\e\de6428981fc2917c3521ede310e53ade33e21676
