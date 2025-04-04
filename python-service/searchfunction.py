@@ -18,16 +18,18 @@ def MINIMAX(chessboard, depth, is_white, move):
 
     logger.debug(f"MINMAX SEARCH: {counter}")
     logger.debug(chessboard)
-    game_over, reason = validation.game_over(chessboard, is_white)
+    
 
-    if depth == 0 or game_over:
-        logger.debug("Matt or Patt")
-        if not game_over: # not Matt or Patt  
-             return Move_with_value(move.start, move.end, validation.evaluate_position(chessboard))  # Bewertung der Stellung
+    if depth == 0:
         
+        game_over, reason = validation.game_over(chessboard, is_white)
+
+        if not game_over: # not Matt or Patt  
+            return Move_with_value(move.start, move.end, validation.evaluate_position(chessboard))  # Bewertung der Stellung
+            
         if is_white: # Matt or Patt and Maximizer
             return Move_with_value(move.start, move.end, INFINITY) if reason == 0 else Move_with_value(move.start, move.end, 0) 
-        
+            
         else: # Matt or Patt and Minimizer
             return Move_with_value(move.start, move.end, NEG_INFINITY) if reason == 0 else Move_with_value(move.start, move.end, 0)
 
@@ -83,15 +85,14 @@ class Move:
 class Move_with_value(Move):
 
     def __init__(self, start, end, value):
-        super().__init__(start, end)
+        super().__init__(start, end) 
         self.value = value
 
 
     def to_chess_notation(self, position):
         column, row = position
-        file = chr(97 + row)  # x von 0-7 -> 'a'-'h'
-        rank = str(8 - column)   # y von 0-7 -> '8'-'1'
-        # return file + rank
+        file = chr(97 + row)  # column von 0-7 -> 'a'-'h'
+        rank = str(8 - column)   # row von 0-7 -> '8'-'1'
         return f"{file}{rank}"
 
 
