@@ -24,16 +24,17 @@ def get_best_move():
     received_fen = data["fen"]  # String has to be decoded -> String recieved as Bytes
     formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
 
-    chessboard = fen_to_array(formatted_fen)
-    logger.debug(chessboard)
+
+    chessboard_object = fen_to_chessboard_object(formatted_fen)
+    
+    logger.debug(chessboard_object.chessboard)
 
     searchfunction.counter = 0 # Reset Counter
 
-    best_move = searchfunction.MINIMAX(chessboard, 2, is_white, searchfunction.Move(0,0))
+    best_move = searchfunction.MINIMAX(chessboard_object, 2, is_white, searchfunction.Move(0,0))
     logger.debug(best_move.to_dict)
 
-
-    logger.debug(generate_legal_moves(chessboard, is_white))
+    fen_to_chessboard_object(formatted_fen)
 
     return best_move.to_dict() # Return best move
 
@@ -45,6 +46,25 @@ def evaluate_position(chessboard):
     value += calc_piece_value_with_psqt(chessboard)
 
     return value
+
+
+
+def fen_to_chessboard_object(fen):
+    
+
+    chessboard_fen, information_fen = fen.split(" ",1) 
+    chessboard = fen_to_array(chessboard_fen)
+
+    turn_right, rochade, en_passant, halfmove, fullmove = information_fen.split(" ")
+
+    chessboard_object = Chessboard_state(chessboard, rochade, en_passant)
+
+    logger.debug(chessboard)
+    # logger.debug(f"Turn: {chessboard_object.turn_right}, Rochade: {chessboard_object.rochade}, En Passant: {chessboard_object.en_passant}, Halfmove: {chessboard_object.halfmove}, Fullmove: {chessboard_object.fullmove}")
+
+
+    return chessboard_object
+
 
 
 # Convert FEN into 2D Array
@@ -196,7 +216,13 @@ def generate_moves(chessboard, is_white):
      
 
 # Retuns all legal moves for black or white for given chessboard
-def generate_legal_moves(chessboard, is_white):
+def generate_legal_moves(chessboard_object, is_white):
+
+
+    chessboard = chessboard_object.chessboard
+
+    # rochade = rochade_moves(chessboard_object.rochade, chessboard_object.chessboard, is_white)
+    # en_passant = en_passant_moves(chessboard_object.en_passant, is_white)
 
     all_moves = generate_moves(chessboard, is_white) # Generate all possible moves for black or white (is_white)
     legal_moves = {}
@@ -207,9 +233,8 @@ def generate_legal_moves(chessboard, is_white):
            
             for move in value:
 
-                sim_chessboard = make_move(key, move, chessboard) # Simulate move
+                sim_chessboard = make_move(key, move, chessboard_object).chessboard # Simulate move
 
-                
                 if not is_check(sim_chessboard, is_white): 
                     legal_moves.setdefault(key,[]).append((move[0], move[1])) # Add legal move
                 
@@ -217,16 +242,40 @@ def generate_legal_moves(chessboard, is_white):
     return legal_moves
 
 
-# Simulates move from key to move on chessboard, returns new chessboard
-def make_move(key, move, chessboard): 
 
-    sim_chessboard = copy.deepcopy(chessboard) # Copy Chessboard
+
+def rochade_moves(possible_rochade, chessboard, is_white):
+    
+    if possible_rochade == "-":
+        return None
+
+    if is_white:
+        Q_possible = chessboard[7][1] == 0 and chessboard[7][2] == 0 and chessboard[7][3] == 0 
+        K_possible = chessboard[7][5] == 0 and chessboard[7][6] == 0
+
+
+    return 
+
+
+
+    
+    
+
+
+# Simulates move from key to move on chessboard, returns new chessboard
+def make_move(key, move, chessboard_object): 
+
+    sim_chessboard = copy.deepcopy(chessboard_object.chessboard) # Copy Chessboard
 
     piece = sim_chessboard[key[0]][key[1]] # Get current piece
+
     sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
     sim_chessboard[move[0]][move[1]] = piece
+
+
+    new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.rochade, chessboard_object.en_passant)
     
-    return sim_chessboard
+    return new_chessboard_object
 
 
 # Returns true if current chessboard results in check, else false
@@ -253,9 +302,9 @@ def is_check(chessboard, is_white):
 # true, 0 if matt
 # true, 1 if patt
 # false, none if still legal moves left
-def game_over(chessboard, is_white):
+def game_over(chessboard_object, is_white):
 
-    legal_moves = len(generate_legal_moves(chessboard, is_white)) 
+    legal_moves = len(generate_legal_moves(chessboard_object, is_white)) 
 
     if legal_moves != 0:
         return False, None
@@ -462,6 +511,17 @@ def in_bound(row, column):
 # Returns true if figure is an enemy piece, else false
 def is_enemy(is_white, figure):
     return str.islower(figure) if is_white else str.isupper(figure)
+
+
+
+
+
+class Chessboard_state:
+
+    def __init__(self, chessboard, rochade, en_passant):
+        self.chessboard = chessboard
+        self.rochade = rochade
+        self.en_passant = en_passant
 
 
 

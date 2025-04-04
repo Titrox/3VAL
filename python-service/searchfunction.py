@@ -11,10 +11,12 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %
 logger = logging.getLogger()
 
 
-def MINIMAX(chessboard, depth, is_white, move):
+def MINIMAX(chessboard_object, depth, is_white, move):
     global counter
     counter += 1
     logger.debug(counter)
+
+    chessboard = chessboard_object.chessboard
 
     logger.debug(f"MINMAX SEARCH: {counter}")
     logger.debug(chessboard)
@@ -22,7 +24,7 @@ def MINIMAX(chessboard, depth, is_white, move):
 
     if depth == 0:
         
-        game_over, reason = validation.game_over(chessboard, is_white)
+        game_over, reason = validation.game_over(chessboard_object, is_white)
 
         if not game_over: # not Matt or Patt  
             return Move_with_value(move.start, move.end, validation.evaluate_position(chessboard))  # Bewertung der Stellung
@@ -38,11 +40,11 @@ def MINIMAX(chessboard, depth, is_white, move):
         best_move = Move_with_value(0, 0, NEG_INFINITY)
         best_first_move = None  # Speichert den besten ersten Zug auf der höchsten Ebene
 
-        for start, value in validation.generate_legal_moves(chessboard, is_white).items():
+        for start, value in validation.generate_legal_moves(chessboard_object, is_white).items():
             for end in value:
                 move = Move(start, end)
-                new_board = validation.make_move(start, end, chessboard)
-                new_move = MINIMAX(new_board, depth - 1, False, move)
+                new_chessboard_object = validation.make_move(start, end, chessboard_object)
+                new_move = MINIMAX(new_chessboard_object, depth - 1, False, move)
 
                 if new_move.value > best_move.value:
                     best_move = new_move
@@ -57,11 +59,11 @@ def MINIMAX(chessboard, depth, is_white, move):
         best_move = Move_with_value(0, 0, INFINITY)
         best_first_move = None  # Speichert den besten ersten Zug auf der höchsten Ebene
 
-        for start, value in validation.generate_legal_moves(chessboard, is_white).items():
+        for start, value in validation.generate_legal_moves(chessboard_object, is_white).items():
             for end in value:
                 move = Move(start, end)
-                new_board = validation.make_move(start, end, chessboard)
-                new_move = MINIMAX(new_board, depth - 1, True, move)
+                new_chessboard_object = validation.make_move(start, end, chessboard_object)
+                new_move = MINIMAX(new_chessboard_object, depth - 1, True, move)
 
                 if new_move.value < best_move.value:
                     best_move = new_move

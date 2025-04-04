@@ -87,6 +87,7 @@ class Chessboard_from_fen_tests(unittest.TestCase):
         self.assertEqual(expected, result)
 
 
+
     def test_case_3(self):
 
         expected = [
