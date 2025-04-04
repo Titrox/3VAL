@@ -237,10 +237,10 @@ def make_move(key, move, chessboard):
 
 def is_check(chessboard, is_white):
 
-    all_opponent_moves = generate_moves(chessboard, not is_white) # Return all possible moves of opponent
+    all_opponent_moves = generate_moves(chessboard, not is_white) # Returns all possible moves of opponent
     king_field = get_king_field(chessboard, is_white)
 
-    for key, value in all_opponent_moves.items(): # Iterate trough all moves
+    for key, value in all_opponent_moves.items(): # Iterate trough all opponents moves
         
         if (len(value) != 0): 
            
@@ -255,10 +255,24 @@ def is_check(chessboard, is_white):
  
 
 
+# Returns tupel (is_gamemover, reason) 
+# true, 0 if matt
+# true, 1 if patt
+# false, none if still legal moves left
+
 def game_over(chessboard, is_white):
 
     legal_moves = len(generate_legal_moves(chessboard, is_white)) 
-    return False if legal_moves != 0 else True
+
+    if legal_moves != 0:
+        return False, None
+    
+    elif is_check:
+        return True, 0
+    
+    else:
+        return True, 1
+    
 
 
     
@@ -449,6 +463,7 @@ def king_moves(field_row, field_column, is_white, chessboard):
     return possible_moves
         
 
+# Checks if (row, column) is still on chessboard
 
 def in_bound(row, column):
     return 0 <= row <= 7 and 0 <= column <= 7 
