@@ -330,63 +330,66 @@ def legal_castling_moves(possible_castling, chessboard, is_white):
 
 # Check if en passant is legal and return possible en passant moves
 def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
-    
+
     en_passant_moves = {}
 
-
-    if possible_en_passant == '-': # No en passant moves possible
+    # If no en passant target square is specified in the FEN string
+    if possible_en_passant == '-':
         return {}
 
-    else: # En passant possible
-
-
-        # Convert string to tupel of form (row, col)
+    # If an en passant target square is specified
+    else:
+        # Convert the en passant target square from algebraic notation (e.g., 'e6')
+        # to a tuple of (row, column) where (0, 0) is the top-left square.
         en_passant_move = list(possible_en_passant)
         column = en_passant_move[0]
-        converted_column = ord(column) - ord("a")  # z.B. a ➝ 0, b ➝ 1, ..., h ➝ 7
-        converted_row = 7 - (int(en_passant_move[1]) - 1)
+        converted_column = ord(column) - ord("a")  # e.g., 'a' -> 0, 'b' -> 1, ..., 'h' -> 7
+        converted_row = 7 - (int(en_passant_move[1]) - 1) # e.g., '6' -> row 2 (0-indexed)
 
         converted_en_passant_move = (converted_row, converted_column)
         logger.debug(converted_en_passant_move)
 
-        if converted_row == 5: # Possible en passant for black
+        # If the en passant target row is the 5th rank (for black's pawn capture)
+        if converted_row == 5:
+            # Check for black pawns that can make the en passant capture
+            for field in [-1, +1]: # Check the squares to the left and right of the target square
+                # Check if the adjacent square contains a black pawn and is within the board boundaries
+                if in_bound(converted_row - 1, converted_column + field) and chessboard[converted_row - 1][converted_column + field] == 'p':
 
-            for field in [-1, +1]: 
-
-                if in_bound(converted_row - 1, converted_column + field) and chessboard[converted_row - 1][converted_column + field] == 'p': # Check for pawn on relevant fields 
-
-                    
+                    # Simulate the en passant move
                     sim_chessboard = copy.deepcopy(chessboard)
-                    sim_chessboard[converted_row][converted_column] = 'p'
-                    sim_chessboard[converted_row - 1][converted_column] = 0
+                    sim_chessboard[converted_row][converted_column] = 'p' # Place the capturing pawn on the target square
+                    sim_chessboard[converted_row - 1][converted_column] = 0 # Remove the captured white pawn
 
-
+                    # Check if the move leaves the black king in check
                     if is_check(sim_chessboard, is_white):
-                        break
+                        break # If it does, this en passant move is illegal
 
                     else:
-                        en_passant_moves.setdefault((converted_row - 1, converted_column + field),[]).append(converted_en_passant_move)
-                        
+                        # If the move is legal, add it to the possible en passant moves
+                        # The key is the starting position of the capturing pawn, the value is a list containing the target square
+                        en_passant_moves.setdefault((converted_row - 1, converted_column + field), []).append(converted_en_passant_move)
 
+        # If the en passant target row is the 3rd rank (for white's pawn capture)
+        elif converted_row == 3:
+            # Check for white pawns that can make the en passant capture
+            for field in [-1, +1]: # Check the squares to the left and right of the target square
+                # Check if the adjacent square contains a white pawn and is within the board boundaries
+                if in_bound(converted_row + 1, converted_column + field) and chessboard[converted_row + 1][converted_column + field] == 'P':
 
-        elif converted_row == 3: # Possible en passant for white
-           
-           
-            for field in [-1, +1]: 
-
-                if in_bound(converted_row + 1, converted_column + field) and chessboard[converted_row + 1][converted_column + field] == 'p': # Check for pawn on relevant fields 
-
+                    # Simulate the en passant move
                     sim_chessboard = copy.deepcopy(chessboard)
-                    sim_chessboard[converted_row][converted_column] = 'P'
-                    sim_chessboard[converted_row + 1][converted_column] = 0
+                    sim_chessboard[converted_row][converted_column] = 'P' # Place the capturing pawn on the target square
+                    sim_chessboard[converted_row + 1][converted_column] = 0 # Remove the captured black pawn
 
-
+                    # Check if the move leaves the white king in check
                     if is_check(sim_chessboard, is_white):
-                        break
+                        break # If it does, this en passant move is illegal
 
                     else:
-                        en_passant_moves.setdefault((converted_row + 1, converted_column + field),[]).append(converted_en_passant_move)
-
+                        # If the move is legal, add it to the possible en passant moves
+                        # The key is the starting position of the capturing pawn, the value is a list containing the target square
+                        en_passant_moves.setdefault((converted_row + 1, converted_column + field), []).append(converted_en_passant_move)
 
     return en_passant_moves
     
