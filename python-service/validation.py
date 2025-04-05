@@ -6,146 +6,143 @@ import searchfunction
 import copy
 
 
+# Setting up basic logging configuration
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s", force=True)
 logger = logging.getLogger()
 
+# Initialize Flask application
 app = Flask(__name__)
 
 Pieces = constants.Pieces
 
-# Retuns best move found by searchfunction {from: ... , to: ...} TODO Promotion
+# Flask route to get the best move using the minimax algorithm
+# Returns a dictionary with 'from' and 'to' fields
 @app.route('/best-move', methods=['POST'])
 def get_best_move():
         
     data = request.get_json()
 
-    is_white = data["is_white"]
+    is_white = data["is_white"]  # Boolean indicating if it's white's turn
 
-    received_fen = data["fen"]  # String has to be decoded -> String recieved as Bytes
-    formatted_fen = urllib.parse.unquote(received_fen) # Return to ASCII-notation of FEN
+    received_fen = data["fen"]  # Get the FEN string from the request
+    formatted_fen = urllib.parse.unquote(received_fen)  # Decode URL-encoded FEN string to ASCII
 
 
-    chessboard_object = fen_to_chessboard_object(formatted_fen)
+    chessboard_object = fen_to_chessboard_object(formatted_fen)  # Convert FEN to chessboard object
     
     logger.debug(chessboard_object.chessboard)
 
-    searchfunction.counter = 0 # Reset Counter
+    searchfunction.counter = 0  # Reset search counter
 
+    # Search for the best move with depth 2
     best_move = searchfunction.MINIMAX(chessboard_object, 2, is_white, searchfunction.Move(0,0))
     logger.debug(best_move.to_dict)
 
     fen_to_chessboard_object(formatted_fen)
 
-    return best_move.to_dict() # Return best move
+    return best_move.to_dict()  # Return the best move found
 
 
-# Evaluates current chessboard
+# Evaluates current chessboard position
 def evaluate_position(chessboard):
 
     value = 0
-    value += calc_piece_value_with_psqt(chessboard)
+    value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions
 
     return value
 
 
-
+# Convert FEN string to a chessboard object
 def fen_to_chessboard_object(fen):
     
-
+    # Split FEN into board position and game information
     chessboard_fen, information_fen = fen.split(" ",1) 
-    chessboard = fen_to_array(chessboard_fen)
+    chessboard = fen_to_array(chessboard_fen)  # Convert the position part to a 2D array
 
+    # Extract additional information from FEN
     turn_right, rochade, en_passant, halfmove, fullmove = information_fen.split(" ")
 
+    # Create a chessboard state object with the position and castling/en passant rights
     chessboard_object = Chessboard_state(chessboard, rochade, en_passant)
 
     logger.debug(chessboard)
     # logger.debug(f"Turn: {chessboard_object.turn_right}, Rochade: {chessboard_object.rochade}, En Passant: {chessboard_object.en_passant}, Halfmove: {chessboard_object.halfmove}, Fullmove: {chessboard_object.fullmove}")
 
-
     return chessboard_object
 
 
-
-# Convert FEN into 2D Array
+# Convert FEN position string into a 2D array
 def fen_to_array(fen):
     
-    # 2D Array 8x8
+    # Create empty 8x8 chessboard
     chessboard = [[0 for _ in range(8)] for _ in range(8)]
 
     current_field = 0
     current_row = 0
     current_column = 0
 
-
+    # Process each character in the FEN string
     for char in fen: 
 
-        if char.isalpha():
+        if char.isalpha():  # If it's a piece
             current_row = current_field // 8
             current_column = current_field % 8
-            chessboard[current_row][current_column] = char
+            chessboard[current_row][current_column] = char  # Place the piece on the board
             current_field += 1
            
-
-        elif char.isdigit():
+        elif char.isdigit():  # If it's a number (empty squares)
             current_field += int(char)
 
-        elif char == " ":
+        elif char == " ":  # End of the board position part
             break
 
     return chessboard
 
 
-
-# Return piece-value-difference based of piece-value and PSQT 
-def calc_piece_value_with_psqt(chessboard): # TODO incremental 
+# Calculate the total value of a position based on piece values and piece-square tables
+def calc_piece_value_with_psqt(chessboard):
 
     value = 0
     currentField = 0
 
-    # Iterate trought 2D Array
+    # Iterate through the 2D array
     for i in range(8): 
         for j in range(8): 
 
             char = chessboard[i][j]
 
-            if char == 0:
+            if char == 0:  # Empty square
                 currentField += 1
 
-
-            elif char.isupper(): # White
-                psqtValue = get_psqt_value(currentField, char, True)
-                value += getattr(Pieces, char, 0) + psqtValue
+            elif char.isupper():  # White piece
+                psqtValue = get_psqt_value(currentField, char, True)  # Get position value
+                value += getattr(Pieces, char, 0) + psqtValue  # Add piece value and position value
 
                 currentField += 1 
 
-
-            elif char.islower(): # Black
-                psqtValue = get_psqt_value(currentField, char, False)
-                value -= getattr(Pieces, char.upper(), 0) + psqtValue
+            elif char.islower():  # Black piece
+                psqtValue = get_psqt_value(currentField, char, False)  # Get position value
+                value -= getattr(Pieces, char.upper(), 0) + psqtValue  # Subtract piece value and position value
             
                 currentField += 1
-
    
     return value
 
 
-
-# Return PSQT Value of given piece on given field
+# Get the position value from the piece-square table for a given piece and position
 def get_psqt_value(field, piece, is_white):
 
-    psqt = get_psqt_table(piece, is_white)
+    psqt = get_psqt_table(piece, is_white)  # Get the appropriate piece-square table
     kingOrQueen = piece.upper() == "K" or piece.upper() == "Q"
-
         
-    if not is_white or kingOrQueen:  # Check if king or queen is currently evaluated to correctly access mirrored PSQT
+    # For black pieces or kings/queens, use the mirrored square value
+    if not is_white or kingOrQueen:
         return psqt[63 - field]  # Return mirrored value
     else:
-         return psqt[field] # Else return 
-        
+         return psqt[field]  # Return normal value
         
 
-# Return PSQT Table of piece
+# Return the appropriate piece-square table for a given piece
 def get_psqt_table(piece, is_white):
     
     match piece.upper():
@@ -158,8 +155,7 @@ def get_psqt_table(piece, is_white):
         case _: logger.error(f"no PSQT found for {piece}"); return -1  
 
 
-
-# Return white or black King-PSQT
+# Return the appropriate king piece-square table based on color
 def get_king_psqt(is_white):
     if is_white:
         return constants.Psqt.KING_PSQT
@@ -167,8 +163,7 @@ def get_king_psqt(is_white):
         return constants.Psqt.KING_PSQT_BLACK
 
 
-
-# Return white or black Queen-PSQT
+# Return the appropriate queen piece-square table based on color
 def get_queen_psqt(is_white):
     if is_white:
         return constants.Psqt.QUEEN_PSQT
@@ -176,22 +171,21 @@ def get_queen_psqt(is_white):
         return constants.Psqt.QUEEN_PSQT_BLACK
 
 
-
-# Returns 2D array of all possible moves for black or white for given position
-# TODO Add Turn_object for en passent etc.
+# Generate all possible moves for each piece of the given color
 def generate_moves(chessboard, is_white):
     
-    moves = {} # Dic for all moves
+    moves = {}  # Dictionary to store moves: {(row, col): [(to_row, to_col), ...]}
 
+    # Iterate through all positions on the board
     for i in range(8):
         for j in range(8):
 
             piece = chessboard[i][j]
 
-            if piece == 0:
+            if piece == 0:  # Skip empty squares
                 continue
                 
-
+            # Generate moves for white pieces if it's white's turn
             if piece.isupper() and is_white:
 
                 match piece:
@@ -202,6 +196,7 @@ def generate_moves(chessboard, is_white):
                     case 'Q': moves.setdefault((i, j),[]).extend(queen_moves(i, j, True, chessboard))
                     case 'K': moves.setdefault((i, j),[]).extend(king_moves(i, j, True, chessboard))
 
+            # Generate moves for black pieces if it's black's turn
             elif piece.islower() and not is_white: 
 
                 match piece:
@@ -215,315 +210,369 @@ def generate_moves(chessboard, is_white):
     return moves
      
 
-# Retuns all legal moves for black or white for given chessboard
+# Generate all legal moves (considering check)
 def generate_legal_moves(chessboard_object, is_white):
-
 
     chessboard = chessboard_object.chessboard
 
-    # rochade = rochade_moves(chessboard_object.rochade, chessboard_object.chessboard, is_white)
+    # Get castling moves if available
+    rochade_moves = legal_rochade_moves(chessboard_object.rochade, chessboard_object.chessboard, is_white)
+    king_field = get_king_field(chessboard, is_white)  # Find the king's position
+    
     # en_passant = en_passant_moves(chessboard_object.en_passant, is_white)
 
-    all_moves = generate_moves(chessboard, is_white) # Generate all possible moves for black or white (is_white)
+    # Get all pseudo-legal moves
+    all_moves = generate_moves(chessboard, is_white)
     legal_moves = {}
-    
+
+    # Filter out moves that would leave the king in check
     for key, value in all_moves.items():
         
-        if (len(value) != 0): 
+        if (len(value) != 0):
            
             for move in value:
-
-                sim_chessboard = make_move(key, move, chessboard_object).chessboard # Simulate move
+                # Simulate the move to see if it leaves the king in check
+                sim_chessboard = make_move(key, move, chessboard_object).chessboard
 
                 if not is_check(sim_chessboard, is_white): 
-                    legal_moves.setdefault(key,[]).append((move[0], move[1])) # Add legal move
+                    legal_moves.setdefault(key,[]).append((move[0], move[1]))  # Add legal move
                 
+    # Add castling moves if available
+    if len(rochade_moves) != 0:
+        legal_moves.setdefault(king_field,[]).extend(rochade_moves)
 
     return legal_moves
 
 
+# Check if castling is legal and return possible castling moves
+def legal_rochade_moves(possible_rochade, chessboard, is_white):
 
-
-def rochade_moves(possible_rochade, chessboard, is_white):
+    rochade_moves = []
     
-    if possible_rochade == "-":
+    if possible_rochade == "-":  # No castling rights
         return None
 
-    if is_white:
-        Q_possible = chessboard[7][1] == 0 and chessboard[7][2] == 0 and chessboard[7][3] == 0 
-        K_possible = chessboard[7][5] == 0 and chessboard[7][6] == 0
+    elif is_white:  # White castling
+
+        if "Q" in possible_rochade:  # Queenside castling
+            # Check if squares between king and rook are empty
+            Q_possible = chessboard[7][1] == 0 and chessboard[7][2] == 0 and chessboard[7][3] == 0  
+
+            if Q_possible:
+                sim_chessboard = copy.deepcopy(chessboard)  # Copy Chessboard
+
+                # Simulate the castling move
+                sim_chessboard[7][2] = 'K' 
+                sim_chessboard[7][3] = 'R'
+
+                # Check if castling would leave the king in check
+                if not is_check(sim_chessboard, is_white):
+                    rochade_moves.append((7,2))
+
+        if "K" in possible_rochade:  # Kingside castling
+            # Check if squares between king and rook are empty
+            K_possible = chessboard[7][5] == 0 and chessboard[7][6] == 0 
+
+            if K_possible:
+                sim_chessboard = copy.deepcopy(chessboard)  # Copy Chessboard
+
+                # Simulate the castling move
+                sim_chessboard[7][6] = 'K' 
+                sim_chessboard[7][5] = 'R'
+
+                # Check if castling would leave the king in check
+                if not is_check(sim_chessboard, is_white):
+                    rochade_moves.append((7,6))
+
+    else:  # Black castling
+
+            if "q" in possible_rochade:  # Queenside castling
+                logger.debug("q detected")
+
+                # Check if squares between king and rook are empty
+                Q_possible = chessboard[0][1] == 0 and chessboard[0][2] == 0 and chessboard[0][3] == 0  
+
+                if Q_possible:
+                    sim_chessboard = copy.deepcopy(chessboard)  # Copy Chessboard
+
+                    # Simulate the castling move
+                    sim_chessboard[0][2] = 'k' 
+                    sim_chessboard[0][3] = 'r'
+
+                    # Check if castling would leave the king in check
+                    if not is_check(sim_chessboard, is_white):
+                        rochade_moves.append((0,2))
+
+            if "k" in possible_rochade:  # Kingside castling
+                # Check if squares between king and rook are empty
+                K_possible = chessboard[0][5] == 0 and chessboard[0][6] == 0 
+
+                if K_possible:
+                    sim_chessboard = copy.deepcopy(chessboard)  # Copy Chessboard
+
+                    # Simulate the castling move
+                    sim_chessboard[0][6] = 'k' 
+                    sim_chessboard[0][5] = 'r'
+
+                    # Check if castling would leave the king in check
+                    if not is_check(sim_chessboard, is_white):
+                        rochade_moves.append((0,6))                
+
+    return rochade_moves
 
 
-    return 
-
-
-
-    
-    
-
-
-# Simulates move from key to move on chessboard, returns new chessboard
+# Simulate a move and return the resulting board state
 def make_move(key, move, chessboard_object): 
 
-    sim_chessboard = copy.deepcopy(chessboard_object.chessboard) # Copy Chessboard
+    sim_chessboard = copy.deepcopy(chessboard_object.chessboard)  # Create a deep copy of the board
 
-    piece = sim_chessboard[key[0]][key[1]] # Get current piece
+    piece = sim_chessboard[key[0]][key[1]]  # Get the piece to move
 
-    sim_chessboard[key[0]][key[1]] = 0 # Remove Figure
-    sim_chessboard[move[0]][move[1]] = piece
+    sim_chessboard[key[0]][key[1]] = 0  # Remove piece from original position
+    sim_chessboard[move[0]][move[1]] = piece  # Place piece at new position
 
-
+    # Create a new chessboard state with the updated position
     new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.rochade, chessboard_object.en_passant)
     
     return new_chessboard_object
 
 
-# Returns true if current chessboard results in check, else false
+# Check if the king of the given color is in check
 def is_check(chessboard, is_white):
 
-    all_opponent_moves = generate_moves(chessboard, not is_white) # Returns all possible moves of opponent
-    king_field = get_king_field(chessboard, is_white)
+    # Get all possible moves by the opponent
+    all_opponent_moves = generate_moves(chessboard, not is_white)
+    king_field = get_king_field(chessboard, is_white)  # Find the king's position
 
-    for key, value in all_opponent_moves.items(): # Iterate trough all opponents moves
+    # Check if any opponent move can capture the king
+    for key, value in all_opponent_moves.items():
         
         if (len(value) != 0): 
            
             for move in value: 
 
-                if move == king_field: # King is attacked -> check
+                if move == king_field:  # King is attacked -> check
                     return True
                 
-    
-    return False # King is not attacked            
+    return False  # King is not attacked            
  
 
-
-# Returns tupel (is_gamemover, reason) 
-# true, 0 if matt
-# true, 1 if patt
-# false, none if still legal moves left
+# Check if the game is over (checkmate or stalemate)
 def game_over(chessboard_object, is_white):
 
     legal_moves = len(generate_legal_moves(chessboard_object, is_white)) 
 
-    if legal_moves != 0:
+    if legal_moves != 0:  # If there are legal moves, game continues
         return False, None
     
-    elif is_check:
+    elif is_check:  # No legal moves and king in check = checkmate
         return True, 0
     
-    else:
+    else:  # No legal moves and king not in check = stalemate
         return True, 1
     
 
-
-    
-
-# Returns field king is on for black or white 
+# Find the position of the king for a given color
 def get_king_field(chessboard, is_white):
 
     for i in range(8):
         for j in range(8):
 
-            if is_white and chessboard[i][j] == 'K':
+            if is_white and chessboard[i][j] == 'K':  # White king
                 return (i,j)
 
-            elif not is_white and chessboard[i][j] == 'k':
+            elif not is_white and chessboard[i][j] == 'k':  # Black king
                 return (i,j) 
             
-        
-    return (-1,-1) # No King found
+    return (-1,-1)  # No king found (should never happen in a legal position)
 
     
-    
-# TODO en passent etc.
-# Returns all possible pawn moves on field (field_row, field_column) for black or white
+# Generate all possible pawn moves
 def pawn_moves(field_row, field_column, is_white, chessboard):
     possible_moves = []
 
-
+    # Set direction and starting row based on color
     if is_white:
         forward_row = field_row - 1
         start_row = 6
-        direction = -1  # Weiß zieht nach oben
+        direction = -1  # White moves up
     else:
         forward_row = field_row + 1
         start_row = 1
-        direction = 1  # Schwarz zieht nach unten
+        direction = 1  # Black moves down
 
-    # Ein Feld vorwärts, wenn frei
+    # One square forward if empty
     if chessboard[forward_row][field_column] == 0:
         possible_moves.append((forward_row, field_column))
 
-        # Zwei Felder vorwärts, wenn Startposition und beide Felder frei
+        # Two squares forward from starting position if both squares are empty
         if field_row == start_row and chessboard[forward_row + direction][field_column] == 0:
             possible_moves.append((forward_row + direction, field_column))
 
-    # Schlagzüge nach links und rechts prüfen
-    for side in [-1, 1]:  # -1 = links, +1 = rechts
+    # Check diagonal captures
+    for side in [-1, 1]:  # -1 = left, +1 = right
         new_column = field_column + side
-        if 0 <= new_column <= 7:  # Prüfen, ob innerhalb der Spielfeldgrenzen
+        if 0 <= new_column <= 7:  # Check if within board boundaries
             target_piece = chessboard[forward_row][new_column]
-            if target_piece != 0 and is_enemy(is_white, target_piece):  # Feindliche Figur dort?
+            if target_piece != 0 and is_enemy(is_white, target_piece):  # Enemy piece there?
                 possible_moves.append((forward_row, new_column))
 
-    
     return possible_moves
 
 
-# Returns all possible bishop moves on field (field_row, field_column) for black or white
+# Generate all possible bishop moves
 def bishop_moves(field_row, field_column, is_white, chessboard):
 
-    move_pattern = constants.Piece_moves.Bishop
+    move_pattern = constants.Piece_moves.Bishop  # Get bishop movement directions
     possible_moves = []
 
     for direction in move_pattern:
-        row, column = field_row, field_column  # Startposition
+        row, column = field_row, field_column  # Starting position
 
+        # Continue moving in the direction until blocked
         while in_bound(row + direction[0], column + direction[1]):
 
-            row += direction[0] # directioion[0] stores vertical movement
-            column += direction[1] # directioion[0] stores horizontal movement
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
 
-            if chessboard[row][column] == 0:
+            if chessboard[row][column] == 0:  # Empty square
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  # Enemy piece
                 possible_moves.append((row, column))
-                break  # Gegner blockiert weitere Bewegung
+                break  # Enemy blocks further movement
 
-            else: # Eigene Figur blockiert Bewegung
+            else:  # Own piece blocks movement
                 break
 
     return possible_moves
 
 
-# Returns all possible knight moves on field (field_row, field_column) for black or white
+# Generate all possible knight moves
 def knight_moves(field_row, field_column, is_white, chessboard):
     
-    move_pattern = constants.Piece_moves.Knight
+    move_pattern = constants.Piece_moves.Knight  # Get knight movement directions
     possible_moves = []
 
     for direction in move_pattern:
-        row, column = field_row, field_column  # Startposition
+        row, column = field_row, field_column  # Starting position
 
+        # Check if the target square is within the board
         if in_bound(row + direction[0], column + direction[1]):
 
-            row += direction[0] # directioion[0] stores vertical movement
-            column += direction[1] # directioion[0] stores horizontal movement
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
 
-            if chessboard[row][column] == 0:
+            if chessboard[row][column] == 0:  # Empty square
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  #Gegner blockiert weitere Bewegung
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  # Enemy piece
                 possible_moves.append((row, column))
                 
-            #else: # Eigene Figur blockiert Bewegung
-            #   logger.debug(f"Knight blocked by own piece {row}, {column}")
+            # Own piece blocks movement (no else needed)
 
     return possible_moves
 
 
-# Returns all possible rook moves field (field_row, field_column) for black or white
+# Generate all possible rook moves
 def rook_moves(field_row, field_column, is_white, chessboard):
 
-    move_pattern = constants.Piece_moves.Rook
+    move_pattern = constants.Piece_moves.Rook  # Get rook movement directions
     possible_moves = []
 
     for direction in move_pattern:
-        row, column = field_row, field_column  # Startposition
+        row, column = field_row, field_column  # Starting position
 
+        # Continue moving in the direction until blocked
         while in_bound(row + direction[0], column + direction[1]):
 
-            row += direction[0] # directioion[0] stores vertical movement
-            column += direction[1] # directioion[0] stores horizontal movement
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
 
-            if chessboard[row][column] == 0:
+            if chessboard[row][column] == 0:  # Empty square
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  # Enemy piece
                 possible_moves.append((row, column))
-                break  # Gegner blockiert weitere Bewegung
+                break  # Enemy blocks further movement
 
-            else: # Eigene Figur blockiert Bewegung
+            else:  # Own piece blocks movement
                 break
 
     return possible_moves
 
 
-# Returns all possible queen moves on field (field_row, field_column) for black or white
+# Generate all possible queen moves
 def queen_moves(field_row, field_column, is_white, chessboard):
     
-    move_pattern = constants.Piece_moves.Queen
+    move_pattern = constants.Piece_moves.Queen  # Get queen movement directions (combination of rook and bishop)
     possible_moves = []
 
     for direction in move_pattern:
-        row, column = field_row, field_column  # Startposition
+        row, column = field_row, field_column  # Starting position
 
+        # Continue moving in the direction until blocked
         while in_bound(row + direction[0], column + direction[1]):
 
-            row += direction[0] # directioion[0] stores vertical movement
-            column += direction[1] # directioion[0] stores horizontal movement
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
 
-            if chessboard[row][column] == 0:
+            if chessboard[row][column] == 0:  # Empty square
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  # Enemy piece
                 possible_moves.append((row, column))
-                break  # Gegner blockiert weitere Bewegung
+                break  # Enemy blocks further movement
 
-            else: # Eigene Figur blockiert Bewegung
+            else:  # Own piece blocks movement
                 break
 
     return possible_moves
         
 
-# Returns all possible king moves on field (field_row, field_column) for black or white
+# Generate all possible king moves
 def king_moves(field_row, field_column, is_white, chessboard):
     
-    move_pattern = constants.Piece_moves.King
+    move_pattern = constants.Piece_moves.King  # Get king movement directions
     possible_moves = []
 
     for direction in move_pattern:
-        row, column = field_row, field_column  # Startposition
+        row, column = field_row, field_column  # Starting position
 
+        # Check if the target square is within the board
         if in_bound(row + direction[0], column + direction[1]):
 
-            row += direction[0] # directioion[0] stores vertical movement
-            column += direction[1] # directioion[0] stores horizontal movement
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
 
-            if chessboard[row][column] == 0:
+            if chessboard[row][column] == 0:  # Empty square
                 possible_moves.append((row, column))
 
-            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]): # Gegner blockiert weitere Bewegung
+            elif chessboard[row][column] != 0 and is_enemy(is_white, chessboard[row][column]):  # Enemy piece
                 possible_moves.append((row, column))
-
 
     return possible_moves
         
 
-
-# Checks if (row, column) is still on chessboard
+# Check if a position is within the board boundaries
 def in_bound(row, column):
     return 0 <= row <= 7 and 0 <= column <= 7 
 
 
-# Returns true if figure is an enemy piece, else false
+# Check if a piece is an enemy piece based on color
 def is_enemy(is_white, figure):
     return str.islower(figure) if is_white else str.isupper(figure)
 
 
-
-
-
+# Class to represent the state of a chessboard
 class Chessboard_state:
 
     def __init__(self, chessboard, rochade, en_passant):
-        self.chessboard = chessboard
-        self.rochade = rochade
-        self.en_passant = en_passant
+        self.chessboard = chessboard  # 2D array representing the board
+        self.rochade = rochade  # Castling rights
+        self.en_passant = en_passant  # En passant target square
 
 
-
+# Run the Flask app if this file is executed directly
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

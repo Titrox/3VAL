@@ -464,6 +464,28 @@ class Knight_move_tests(unittest.TestCase):
         self.assertEqual(expected, validation.king_moves(0, 0, False, chessboard))
 
 
+
+class Rochade_move_tests(unittest.TestCase):
+
+    def test_case_1(self):
+        chessboard = [
+                ['r',0,0,0,'k',0,0,'r'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.legal_rochade_moves("qk", chessboard, False))
+
+
+
+
 class Rook_move_tests(unittest.TestCase):
    
     
