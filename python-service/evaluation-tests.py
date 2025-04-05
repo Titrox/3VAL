@@ -465,27 +465,6 @@ class Knight_move_tests(unittest.TestCase):
 
 
 
-class Rochade_move_tests(unittest.TestCase):
-
-    def test_case_1(self):
-        chessboard = [
-                ['r',0,0,0,'k',0,0,'r'],
-                [0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0]
-            ]
-
-        expected = []
-
-        self.assertEqual(expected, validation.legal_rochade_moves("qk", chessboard, False))
-
-
-
-
 class Rook_move_tests(unittest.TestCase):
    
     
@@ -548,6 +527,79 @@ class Rook_move_tests(unittest.TestCase):
 
         self.assertEqual(expected, validation.rook_moves(3, 3, False, chessboard))
     
+
+class Castling_move_tests(unittest.TestCase):
+
+    def test_case_1(self):
+        chessboard = [
+                ['r',0,0,0,'k',0,0,'r'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected =  [(0, 2), (0, 6)]
+
+        self.assertEqual(expected, validation.legal_castling_moves("qk", chessboard, False))
+
+
+    def test_case_2(self):
+        chessboard = [
+                ['r',0,0,0,'k',0,0,'r'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected =  [(0, 6)]
+
+        self.assertEqual(expected, validation.legal_castling_moves("k", chessboard, False))
+
+
+
+    def test_case_3(self):
+        chessboard = [
+                ['r',0,0,0,'k',0,0,'r'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected =  [(0, 2)]
+
+        self.assertEqual(expected, validation.legal_castling_moves("q", chessboard, False))
+
+
+
+    def test_case_4(self):
+        chessboard = [
+                ['r',0,0,0,'k',0,0,'r'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected = None
+
+        self.assertEqual(expected, validation.legal_castling_moves("-", chessboard, False))
+
+
 
 class Legal_move_tests(unittest.TestCase):
 

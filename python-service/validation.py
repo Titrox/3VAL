@@ -219,7 +219,9 @@ def generate_legal_moves(chessboard_object, is_white):
     castling_moves = legal_castling_moves(chessboard_object.castling, chessboard_object.chessboard, is_white)
     king_field = get_king_field(chessboard, is_white)  # Find the king's position
     
-    # en_passant = en_passant_moves(chessboard_object.en_passant, is_white)
+     # Get legal en passant moves if available
+    en_passant_moves = legal_en_passant_moves(chessboard_object.en_passant, chessboard, is_white)
+    logger.debug(f"En Passant: {en_passant_moves}")
 
     # Get all pseudo-legal moves
     all_moves = generate_moves(chessboard, is_white)
@@ -241,6 +243,11 @@ def generate_legal_moves(chessboard_object, is_white):
     if len(castling_moves) != 0:
         legal_moves.setdefault(king_field,[]).extend(castling_moves)
 
+    if en_passant_moves:
+        legal_moves.update(en_passant_moves)
+
+        logger.debug(legal_moves)
+
     return legal_moves
 
 
@@ -250,7 +257,7 @@ def legal_castling_moves(possible_castling, chessboard, is_white):
     castling_moves = []
     
     if possible_castling == "-":  # No castling rights
-        return None
+        return castling_moves
 
     elif is_white:  # White castling
 
@@ -320,6 +327,69 @@ def legal_castling_moves(possible_castling, chessboard, is_white):
 
     return castling_moves
 
+
+# Check if en passant is legal and return possible en passant moves
+def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
+    
+    en_passant_moves = {}
+
+
+    if possible_en_passant == '-': # No en passant moves possible
+        return {}
+
+    else: # En passant possible
+
+
+        # Convert string to tupel of form (row, col)
+        en_passant_move = list(possible_en_passant)
+        column = en_passant_move[0]
+        converted_column = ord(column) - ord("a")  # z.B. a ➝ 0, b ➝ 1, ..., h ➝ 7
+        converted_row = 7 - (int(en_passant_move[1]) - 1)
+
+        converted_en_passant_move = (converted_row, converted_column)
+        logger.debug(converted_en_passant_move)
+
+        if converted_row == 5: # Possible en passant for black
+
+            for field in [-1, +1]: 
+
+                if in_bound(converted_row - 1, converted_column + field) and chessboard[converted_row - 1][converted_column + field] == 'p': # Check for pawn on relevant fields 
+
+                    
+                    sim_chessboard = copy.deepcopy(chessboard)
+                    sim_chessboard[converted_row][converted_column] = 'p'
+                    sim_chessboard[converted_row - 1][converted_column] = 0
+
+
+                    if is_check(sim_chessboard, is_white):
+                        break
+
+                    else:
+                        en_passant_moves.setdefault((converted_row - 1, converted_column + field),[]).append(converted_en_passant_move)
+                        
+
+
+        elif converted_row == 3: # Possible en passant for white
+           
+           
+            for field in [-1, +1]: 
+
+                if in_bound(converted_row + 1, converted_column + field) and chessboard[converted_row + 1][converted_column + field] == 'p': # Check for pawn on relevant fields 
+
+                    sim_chessboard = copy.deepcopy(chessboard)
+                    sim_chessboard[converted_row][converted_column] = 'P'
+                    sim_chessboard[converted_row + 1][converted_column] = 0
+
+
+                    if is_check(sim_chessboard, is_white):
+                        break
+
+                    else:
+                        en_passant_moves.setdefault((converted_row + 1, converted_column + field),[]).append(converted_en_passant_move)
+
+
+    return en_passant_moves
+    
 
 # Simulate a move and return the resulting board state
 def make_move(key, move, chessboard_object): 
