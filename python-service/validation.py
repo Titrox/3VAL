@@ -60,13 +60,13 @@ def fen_to_chessboard_object(fen):
     chessboard = fen_to_array(chessboard_fen)  # Convert the position part to a 2D array
 
     # Extract additional information from FEN
-    turn_right, rochade, en_passant, halfmove, fullmove = information_fen.split(" ")
+    turn_right, castling, en_passant, halfmove, fullmove = information_fen.split(" ")
 
     # Create a chessboard state object with the position and castling/en passant rights
-    chessboard_object = Chessboard_state(chessboard, rochade, en_passant)
+    chessboard_object = Chessboard_state(chessboard, castling, en_passant)
 
     logger.debug(chessboard)
-    # logger.debug(f"Turn: {chessboard_object.turn_right}, Rochade: {chessboard_object.rochade}, En Passant: {chessboard_object.en_passant}, Halfmove: {chessboard_object.halfmove}, Fullmove: {chessboard_object.fullmove}")
+    # logger.debug(f"Turn: {chessboard_object.turn_right}, Castling: {chessboard_object.castling}, En Passant: {chessboard_object.en_passant}, Halfmove: {chessboard_object.halfmove}, Fullmove: {chessboard_object.fullmove}")
 
     return chessboard_object
 
@@ -215,7 +215,7 @@ def generate_legal_moves(chessboard_object, is_white):
 
     chessboard = chessboard_object.chessboard
 
-    # Get castling moves if available
+    # Get legal castling moves if available
     castling_moves = legal_castling_moves(chessboard_object.castling, chessboard_object.chessboard, is_white)
     king_field = get_king_field(chessboard, is_white)  # Find the king's position
     
@@ -332,7 +332,7 @@ def make_move(key, move, chessboard_object):
     sim_chessboard[move[0]][move[1]] = piece  # Place piece at new position
 
     # Create a new chessboard state with the updated position
-    new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.rochade, chessboard_object.en_passant)
+    new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.castling, chessboard_object.en_passant)
     
     return new_chessboard_object
 
