@@ -216,7 +216,7 @@ def generate_legal_moves(chessboard_object, is_white):
     chessboard = chessboard_object.chessboard
 
     # Get castling moves if available
-    rochade_moves = legal_rochade_moves(chessboard_object.rochade, chessboard_object.chessboard, is_white)
+    castling_moves = legal_castling_moves(chessboard_object.castling, chessboard_object.chessboard, is_white)
     king_field = get_king_field(chessboard, is_white)  # Find the king's position
     
     # en_passant = en_passant_moves(chessboard_object.en_passant, is_white)
@@ -238,23 +238,23 @@ def generate_legal_moves(chessboard_object, is_white):
                     legal_moves.setdefault(key,[]).append((move[0], move[1]))  # Add legal move
                 
     # Add castling moves if available
-    if len(rochade_moves) != 0:
-        legal_moves.setdefault(king_field,[]).extend(rochade_moves)
+    if len(castling_moves) != 0:
+        legal_moves.setdefault(king_field,[]).extend(castling_moves)
 
     return legal_moves
 
 
 # Check if castling is legal and return possible castling moves
-def legal_rochade_moves(possible_rochade, chessboard, is_white):
+def legal_castling_moves(possible_castling, chessboard, is_white):
 
-    rochade_moves = []
+    castling_moves = []
     
-    if possible_rochade == "-":  # No castling rights
+    if possible_castling == "-":  # No castling rights
         return None
 
     elif is_white:  # White castling
 
-        if "Q" in possible_rochade:  # Queenside castling
+        if "Q" in possible_castling:  # Queenside castling
             # Check if squares between king and rook are empty
             Q_possible = chessboard[7][1] == 0 and chessboard[7][2] == 0 and chessboard[7][3] == 0  
 
@@ -267,9 +267,9 @@ def legal_rochade_moves(possible_rochade, chessboard, is_white):
 
                 # Check if castling would leave the king in check
                 if not is_check(sim_chessboard, is_white):
-                    rochade_moves.append((7,2))
+                    castling_moves.append((7,2))
 
-        if "K" in possible_rochade:  # Kingside castling
+        if "K" in possible_castling:  # Kingside castling
             # Check if squares between king and rook are empty
             K_possible = chessboard[7][5] == 0 and chessboard[7][6] == 0 
 
@@ -282,11 +282,11 @@ def legal_rochade_moves(possible_rochade, chessboard, is_white):
 
                 # Check if castling would leave the king in check
                 if not is_check(sim_chessboard, is_white):
-                    rochade_moves.append((7,6))
+                    castling_moves.append((7,6))
 
     else:  # Black castling
 
-            if "q" in possible_rochade:  # Queenside castling
+            if "q" in possible_castling:  # Queenside castling
                 logger.debug("q detected")
 
                 # Check if squares between king and rook are empty
@@ -301,9 +301,9 @@ def legal_rochade_moves(possible_rochade, chessboard, is_white):
 
                     # Check if castling would leave the king in check
                     if not is_check(sim_chessboard, is_white):
-                        rochade_moves.append((0,2))
+                        castling_moves.append((0,2))
 
-            if "k" in possible_rochade:  # Kingside castling
+            if "k" in possible_castling:  # Kingside castling
                 # Check if squares between king and rook are empty
                 K_possible = chessboard[0][5] == 0 and chessboard[0][6] == 0 
 
@@ -316,9 +316,9 @@ def legal_rochade_moves(possible_rochade, chessboard, is_white):
 
                     # Check if castling would leave the king in check
                     if not is_check(sim_chessboard, is_white):
-                        rochade_moves.append((0,6))                
+                        castling_moves.append((0,6))                
 
-    return rochade_moves
+    return castling_moves
 
 
 # Simulate a move and return the resulting board state
@@ -567,9 +567,9 @@ def is_enemy(is_white, figure):
 # Class to represent the state of a chessboard
 class Chessboard_state:
 
-    def __init__(self, chessboard, rochade, en_passant):
+    def __init__(self, chessboard, castling, en_passant):
         self.chessboard = chessboard  # 2D array representing the board
-        self.rochade = rochade  # Castling rights
+        self.castling = castling  # Castling rights
         self.en_passant = en_passant  # En passant target square
 
 
