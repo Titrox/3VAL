@@ -69,8 +69,9 @@ function handleMove() {
 
   <div class="main-container">
 
-    <div class="button-container button-container--settings">
-      <button class="button button--toggle-ai">Toggle AI <i class="bi bi-robot"></i> </button>
+    <div class="button-container container--figure-text-container">
+      <div class="container container--figure-container">Toggle AI <i class="bi bi-robot"></i> </div>
+      <div class="container container--text-container">Toggle AI <i class="bi bi-robot"></i> </div>
     </div>
 
     <div class="chessboard-container">
@@ -165,6 +166,25 @@ function handleMove() {
 
 .button--dissabled {
   background-color: rgb(128, 128, 128);
+}
+
+.container--figure-text-container{
+  height: 20vh;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: row;
+  gap: 0;
+}
+
+
+.container--figure-container{
+  flex: 1;
+}
+
+.container--text-container{
+  flex: 2;
 }
 
 </style>

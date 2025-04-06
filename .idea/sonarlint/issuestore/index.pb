@@ -23,3 +23,5 @@ K
 python-service/constants.py,f\c\fc924b741926d49f4f945ce772ec842454f62bbd
 C
 frontend/index.html,a\1\a12b0e66474192f8cb9a2db83f26413a588dec1d
+D
+frontend/src/App.vue,b\3\b395f139c6c3b350eecc10789c2fb0946ccb4abb

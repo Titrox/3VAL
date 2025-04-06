@@ -595,9 +595,81 @@ class Castling_move_tests(unittest.TestCase):
                 [0,0,0,0,0,0,0,0]
             ]
 
-        expected = None
+        expected = []
 
         self.assertEqual(expected, validation.legal_castling_moves("-", chessboard, False))
+
+
+
+class En_passant_move_tests(unittest.TestCase):
+
+    def test_case_1(self):
+        
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'p','P',0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected =  {(4, 1): [(5, 2)]}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c3", chessboard, False))
+
+
+    def test_case_2(self):
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'p','P','p',0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        expected =  {(4, 1): [(5, 2)], (4, 3): [(5, 2)]}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c3", chessboard, False))
+
+
+    def test_case_3(self):
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'k',0,0,0,0,0,0],
+                [0,'p','P','p',0,0,0,0],
+                [0,'Q',0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        expected =  {(4, 3): [(5, 2)]}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c3", chessboard, False))
+
+
+    def test_case_4(self):
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'k',0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'p','P','p',0,0,0,0],
+                [0,'Q',0,0,'B',0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        expected =  {}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c3", chessboard, False))
 
 
 
