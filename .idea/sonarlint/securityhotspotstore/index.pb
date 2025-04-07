@@ -25,3 +25,5 @@ C
 frontend/index.html,a\1\a12b0e66474192f8cb9a2db83f26413a588dec1d
 D
 frontend/src/App.vue,b\3\b395f139c6c3b350eecc10789c2fb0946ccb4abb
+V
+&frontend/src/assets/roboter-texts.json,6\c\6cbfa7e2cd446d624745fb950953c0f2c7db68d1

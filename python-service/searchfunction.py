@@ -122,4 +122,10 @@ class Move_with_value(Move):
         start_chess_notation = self.to_chess_notation(self.start)
         end_chess_notation = self.to_chess_notation(self.end)
 
-        return {"from": start_chess_notation, "to": end_chess_notation}
+        return {
+            "move": {
+                "from": start_chess_notation, "to": end_chess_notation
+                },
+            "value" : str(self.value) if self.value in (float('inf'), float('-inf')) else self.value
+            }
+    
