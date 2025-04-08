@@ -1,20 +1,26 @@
 <script setup>
 import { ref } from 'vue';
+import { globalState } from 'frontend/public/store/globalState.js';
 
-const audio = new Audio('/music/BackgroundJazz.mp3');
+const audio = new Audio('/music/8-bit.mp3');
+
+
 audio.loop = true;
-const isPlaying = ref(false);
+audio.volume = 0.5
+let soundMuted = ref(globalState.soundMuted);
 
 
 // Toggle Music depending on current isPlaying value
 function toggleMusic() {
-  if (isPlaying.value) {
+  if (!soundMuted.value) {
     audio.pause();
   } else {
     audio.play();
   }
-  isPlaying.value = !isPlaying.value;
-};
+  soundMuted.value = !soundMuted.value;
+  globalState.soundMuted = soundMuted.value
+}
+
 
 
 
@@ -23,7 +29,7 @@ function toggleMusic() {
 
 <template>
   <button class="button button--sound" @click="toggleMusic">
-    <i v-if="!isPlaying" class="bi bi-volume-mute-fill"></i>
+    <i v-if="soundMuted" class="bi bi-volume-mute-fill"></i>
     <i v-else class="bi bi-volume-up-fill"></i>
   </button>
 </template>

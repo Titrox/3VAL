@@ -1,15 +1,19 @@
 <script setup>
 import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import axios from 'axios';
 import robotText from 'frontend/src/assets/roboter-texts.json'
+import { globalState } from 'frontend/public/store/globalState.js'
+
 
 let boardApi;
 
+//
+const soundMuted = computed(() => globalState.soundMuted);
+
 // Client will only be able to play white pieces.
 let playerColor = ref('white');
-
 
 // Value of last chessboard
 let lastValue = ref(0);
@@ -18,13 +22,22 @@ let lastValue = ref(0);
 let deltaValue;
 
 // Robot Emotion
-let emotion = ref('happy');
+let emotion = 'happy';
+
+// Stores robot emotion of last chessboard evaluation
+let lastEmotion = '';
 
 // Robot Message
 let message = ref(robotText["start"][Math.floor(Math.random() * robotText["start"].length)]);
 
-
+// Currently loaded Robot image
 let robotImage = ref('images/happy_1.png')
+
+// Current turn
+let turnNumber = 0;
+
+
+
 
 
 // Receive move from socket/server/etc here.
@@ -39,9 +52,14 @@ function getRobotImage(emotion) {
 
 
 function getRobotEmotion(deltaValue) {
-    if (deltaValue >= 100) return "happy";
-    if (deltaValue <= -50) return "embarrassed";
-    if (deltaValue <= -100) return "shocked";
+
+    if (playerColor.value === 'black') { // Invert value if engine is playing white
+      deltaValue = -deltaValue;
+    }
+
+    if (deltaValue >= 150) return "happy";
+    if (deltaValue <= -70) return "embarrassed";
+    if (deltaValue <= -150) return "shocked";
     return "thoughtful";
 }
 
@@ -63,13 +81,8 @@ async function playBestMove() {
 
       deltaValue = lastValue.value - move_object.value;
       lastValue.value = move_object.value
-      console.log(deltaValue)
 
-      emotion = getRobotEmotion(deltaValue);
-      message.value = robotText[emotion][Math.floor(Math.random() * robotText[emotion].length)];
-      robotImage.value = getRobotImage(emotion)
-      console.log("Emotion changed!")
-      console.log(message)
+      updateRobot(deltaValue);
     }
 
     onReceiveMove(move_object.move);
@@ -79,8 +92,35 @@ async function playBestMove() {
 }
 
 
+function updateRobot(deltaValue) {
+
+
+  emotion = getRobotEmotion(deltaValue);
+
+  if (turnNumber < 3) { // First moves of Engine -
+    message.value = robotText["opening"][Math.floor(Math.random() * robotText["opening"].length)];
+    return
+  }
+
+  // No new text for next few moves
+
+  if ((emotion !== lastEmotion || turnNumber % 3 === 0) && turnNumber > 5) {
+
+    lastEmotion = emotion;
+    message.value = robotText[emotion][Math.floor(Math.random() * robotText[emotion].length)];
+    robotImage.value = getRobotImage(emotion)
+
+    playSpeechSound()
+  }
+
+}
+
 // Resets board
 function resetBoard() {
+
+  deltaValue = 0;
+  lastValue.value = 0;
+
   boardApi.resetBoard();
   playerColor.value = 'white';
   console.log("test")
@@ -100,16 +140,51 @@ function togglePlayerColor() {
 
 
 // Check if it is AIs turn and play the best move found by validation function
+// TODO dont exec if engine is in checkmate
 function handleMove() {
+
+  playPieceSound()
+
   if (boardApi?.getTurnColor() !== playerColor.value) {
     playBestMove();
   }
+
+  turnNumber = boardApi?.getCurrentTurnNumber(); // Increase turn counter
 }
 
 
 function resetRobot() {
   message.value = robotText["start"][Math.floor(Math.random() * robotText["start"].length)];
   robotImage.value = 'images/happy_1.png';
+  playSpeechSound()
+}
+
+
+function playPieceSound() {
+
+  console.log(soundMuted.value)
+
+  if (!soundMuted.value) {
+    const randomNum = Math.floor(Math.random() * 4) + 1;
+    const piece_sound = new Audio(`/sounds/piece-sounds/piece_sound_${randomNum}.wav`)
+    piece_sound.volume = 1.0;
+
+
+    piece_sound.play()
+  }
+}
+
+
+function playSpeechSound() {
+
+  if (!soundMuted.value) {
+    const randomNum = Math.floor(Math.random() * 6) + 1;
+    const speechSound = new Audio(`/sounds/speech-sounds/speech_${randomNum}.wav`)
+    speechSound.volume = 0.3;
+
+    speechSound.play();
+  }
+
 }
 
 function handleCheckmate(isMated) {
@@ -119,17 +194,20 @@ function handleCheckmate(isMated) {
   console.log(isMated === playerColor.value)
 
   if (isMated !== playerColor.value){
+    console.log("Matt");
     emotion = 'embarrassed';
     message.value = robotText["player_win"][Math.floor(Math.random() * robotText["player_win"].length)];
     robotImage.value = 'images/shocked_1.png';
   }
 
   else {
-    console.log("Matt");
+
     emotion = 'happy';
     message.value = robotText["engine_win"][Math.floor(Math.random() * robotText["engine_win"].length)];
     robotImage.value = 'images/happy_1.png';
   }
+
+  playSpeechSound()
 
 }
 
@@ -146,26 +224,26 @@ function handleCheckmate(isMated) {
     </div>
 
     <div class="chessboard-container">
-      <TheChessboard
-          @board-created="(api) => {
-            boardApi = api;
+        <TheChessboard
+            @board-created="(api) => {
+              boardApi = api;
 
-            if (playerColor === 'black') {
-              boardApi.toggleOrientation();
-              handleMove();
-            }
-          }"
+              if (playerColor === 'black') {
+                boardApi.toggleOrientation();
+                handleMove();
+              }
+            }"
 
-          :player-color="playerColor"
-          :key="playerColor"
-          @move="handleMove()"
-          @checkmate="handleCheckmate"
+            :player-color="playerColor"
+            :key="playerColor"
+            @move="handleMove()"
+            @checkmate="handleCheckmate"
 
-      />
+        />
     </div>
 
     <div class="button-container button-container--options">
-      <button class="button button--reset" @click="resetBoard">Brett zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
+      <button class="button button--reset" @click="resetBoard">Zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
       <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
       <button class="button button-switch" @click="togglePlayerColor">Seite wechseln <i class="bi bi-arrow-left-right"></i></button>
     </div>
@@ -175,7 +253,9 @@ function handleCheckmate(isMated) {
 <style scoped>
 
 
-@import url('https://fonts.googleapis.com/css2?family=Jersey+25&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Jersey+25&display=swap');
+
 
 /* CONTAINER */
 
@@ -221,6 +301,9 @@ function handleCheckmate(isMated) {
   border-radius: 10px;
   height: 5vh;
   width: 10vw;
+
+  font-family: 'Dynapuff', Arial, sans-serif;
+  font-weight: 200;
 
   box-shadow: black 4px 4px;
   background-color: #99f381;

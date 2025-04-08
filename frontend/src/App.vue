@@ -2,6 +2,7 @@
 import Chessboard from "./components/Chessboard.vue";
 import Background from "./components/Background.vue";
 import Music from "./components/Music.vue";
+
 </script>
 
 <template>
@@ -9,7 +10,7 @@ import Music from "./components/Music.vue";
     <div class="main-container">
       <Chessboard />
     </div>
-    <div class="music-container">
+    <div class="music-container" ref="musicContainer">
       <Music/>
     </div>
   </Background>

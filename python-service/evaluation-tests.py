@@ -600,6 +600,24 @@ class Castling_move_tests(unittest.TestCase):
         self.assertEqual(expected, validation.legal_castling_moves("-", chessboard, False))
 
 
+    def test_case_4(self):
+
+        chessboard = [
+                ['r',0,0,0,'k',0,0,'r'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,'Q'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.legal_castling_moves("k", chessboard, False))
+
+
 
 class En_passant_move_tests(unittest.TestCase):
 
