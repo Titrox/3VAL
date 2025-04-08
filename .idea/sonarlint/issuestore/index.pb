@@ -31,12 +31,6 @@ Q
 !frontend/src/components/Music.vue,b\b\bbf407cf297ecf7def73de492bee0d598fe9f977
 V
 &frontend/src/components/Background.vue,e\7\e7e9fe08598f0c616f01fd4a398073d62abcc4d0
-M
-frontend/store/globalStore.js,a\4\a4eab2837ed435fb91c48c402e8b31f5fbc12b1f
-T
-$frontend/public/store/globalStore.js,3\b\3b386f5d93a0aa9857962b05dc33934a9c4c361f
-\
-,frontend/src/components/store/globalStore.js,4\6\46bfddf495a21c1c2b8188288f5a6f9e7d652f8d
 T
 $frontend/public/store/globalState.js,c\1\c106fbf40dd3afc48094a6668d9f16d8b62a855e
 D

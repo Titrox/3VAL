@@ -247,8 +247,7 @@ def generate_legal_moves(chessboard_object, is_white):
     if en_passant_moves:
         legal_moves.update(en_passant_moves)
 
-        logger.debug(legal_moves)
-
+    logger.debug(legal_moves)
     return legal_moves
 
 

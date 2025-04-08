@@ -693,6 +693,7 @@ class En_passant_move_tests(unittest.TestCase):
 
 class Legal_move_tests(unittest.TestCase):
 
+
     def test_case_1(self):
 
         chessboard = [
@@ -707,9 +708,11 @@ class Legal_move_tests(unittest.TestCase):
         ]
 
 
+        chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
+
         expected = {(1, 3): [(1, 2), (1, 4), (0, 3), (0, 2), (0, 4), (2, 2), (2, 4)]}
 
-        self.assertEqual(expected, validation.generate_legal_moves(chessboard, False))
+        self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False))
 
 
     def test_case_2(self):
@@ -724,6 +727,8 @@ class Legal_move_tests(unittest.TestCase):
                 [0, 'P', 0, 'P', 'Q', 0, 'P', 0], 
                 ['R', 'N', 'B', 0, 'K', 0, 'N', 'R']
             ]
+
+            chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
 
 
             expected = {
@@ -742,7 +747,7 @@ class Legal_move_tests(unittest.TestCase):
                 (3, 4): [(4, 4)]
                 }
                         
-            self.assertEqual(expected, validation.generate_legal_moves(chessboard, False))
+            self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False))
 
 
     
@@ -759,6 +764,7 @@ class Legal_move_tests(unittest.TestCase):
                 ['R', 'N', 'B', 0, 'K', 0, 'N', 'R']
             ]
 
+            chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
 
             expected = {
                 (0, 0): [(0, 1)], 
@@ -772,7 +778,7 @@ class Legal_move_tests(unittest.TestCase):
                 (3, 1): [(3, 0), (3, 2), (4, 1), (5, 1), (6, 1), (2, 0), (2, 2), (4, 0), (4, 2), (5, 3)], 
                 (3, 4): [(4, 4)]}
                         
-            self.assertEqual(expected, validation.generate_legal_moves(chessboard, False))
+            self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False))
 
 
     def test_case_4(self):
@@ -788,6 +794,7 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 'K', 0, 'R', 0, 'N', 'R']
         ]
 
+        chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
 
         excepted = {
             (0, 0): [(0, 1)], 
@@ -806,7 +813,7 @@ class Legal_move_tests(unittest.TestCase):
             }
         
 
-        self.assertEqual(excepted, validation.generate_legal_moves(chessboard, False))
+        self.assertEqual(excepted, validation.generate_legal_moves(chessboard_object, False))
 
 
 
@@ -822,6 +829,8 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 'K', 'P', 0, 'P', 'P', 0], 
             [0, 0, 0, 'R', 0, 0, 0, 'R']
         ]
+
+        chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
 
         expected = {
             (0, 0): [(0, 1), (1, 0)], 
@@ -839,4 +848,101 @@ class Legal_move_tests(unittest.TestCase):
             }
         
 
-        self.assertEqual(expected, validation.generate_legal_moves(chessboard, False))
+        self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False))
+
+
+
+    def test_case_6(self): # Castling both sides
+        
+        chessboard = [
+            ['r', 0, 0, 0, 'k', 0, 0, 'r'], 
+            [0, 0, 'P', 0, 'b', 'p', 'p', 0], 
+            ['p', 0, 0, 'k', 0, 'B', 0, 'p'], 
+            [0, 'P', 0, 0, 'p', 0, 0, 0], 
+            [0, 'P', 'B', 'q', 0, 0, 0, 'P'], 
+            ['N', 0, 0, 'Q', 'P', 'N', 0, 0], 
+            [0, 0, 'K', 'P', 0, 'P', 'P', 0], 
+            [0, 0, 0, 'R', 0, 0, 0, 'R']
+        ]
+
+        chessboard_object = validation.Chessboard_state(chessboard, "kq", "-")
+
+        expected = {
+            (0, 0): [(0, 1), (0, 2), (0, 3), (1, 0)], 
+            (0, 4): [(0, 5), (1, 3), (0, 2), (0, 6)], 
+            (0, 7): [(0, 6), (0, 5), (1, 7)], 
+            (1, 4): [(0, 3), (0, 5), (2, 5)], 
+            (1, 6): [(2, 6), (3, 6), (2, 5)], 
+            (2, 0): [(3, 0), (3, 1)], 
+            (2, 3): [(2, 2), (2, 4), (1, 3), (3, 3), (1, 2), (3, 2)], 
+            (2, 7): [(3, 7)], 
+            (3, 4): [(4, 4)], 
+            (4, 3): [(4, 2), (4, 4), (4, 5), (4, 6), (4, 7), (3, 3), (5, 3), (3, 2), (2, 1), (1, 0), (5, 2), (6, 1), (7, 0), (5, 4)]}
+        
+
+        self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False))
+
+
+    
+    def test_case_7(self): # Castling q side
+        
+        chessboard = [
+            ['r', 0, 0, 0, 'k', 0, 0, 'r'], 
+            [0, 0, 'P', 0, 'b', 'p', 'p', 0], 
+            ['p', 0, 0, 'k', 0, 'B', 0, 'p'], 
+            [0, 'P', 0, 0, 'p', 0, 0, 0], 
+            [0, 'P', 'B', 'q', 0, 0, 0, 'P'], 
+            ['N', 0, 0, 'Q', 'P', 'N', 0, 0], 
+            [0, 0, 'K', 'P', 0, 'P', 'P', 0], 
+            [0, 0, 0, 'R', 0, 0, 0, 'R']
+        ]
+
+        chessboard_object = validation.Chessboard_state(chessboard, "q", "-")
+
+        expected = {
+            (0, 0): [(0, 1), (0, 2), (0, 3), (1, 0)], 
+            (0, 4): [(0, 5), (1, 3), (0, 2)], 
+            (0, 7): [(0, 6), (0, 5), (1, 7)], 
+            (1, 4): [(0, 3), (0, 5), (2, 5)], 
+            (1, 6): [(2, 6), (3, 6), (2, 5)], 
+            (2, 0): [(3, 0), (3, 1)], 
+            (2, 3): [(2, 2), (2, 4), (1, 3), (3, 3), (1, 2), (3, 2)], 
+            (2, 7): [(3, 7)], 
+            (3, 4): [(4, 4)], 
+            (4, 3): [(4, 2), (4, 4), (4, 5), (4, 6), (4, 7), (3, 3), (5, 3), (3, 2), (2, 1), (1, 0), (5, 2), (6, 1), (7, 0), (5, 4)]}
+        
+
+        self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False)) 
+
+
+
+
+    def test_case_8(self): # Castling k side
+        
+        chessboard = [
+            ['r', 0, 0, 0, 'k', 0, 0, 'r'], 
+            [0, 0, 'P', 0, 'b', 'p', 'p', 0], 
+            ['p', 0, 0, 'k', 0, 'B', 0, 'p'], 
+            [0, 'P', 0, 0, 'p', 0, 0, 0], 
+            [0, 'P', 'B', 'q', 0, 0, 0, 'P'], 
+            ['N', 0, 0, 'Q', 'P', 'N', 0, 0], 
+            [0, 0, 'K', 'P', 0, 'P', 'P', 0], 
+            [0, 0, 0, 'R', 0, 0, 0, 'R']
+        ]
+
+        chessboard_object = validation.Chessboard_state(chessboard, "k", "-")
+
+        expected = {
+            (0, 0): [(0, 1), (0, 2), (0, 3), (1, 0)], 
+            (0, 4): [(0, 5), (1, 3), (0, 6)], 
+            (0, 7): [(0, 6), (0, 5), (1, 7)], 
+            (1, 4): [(0, 3), (0, 5), (2, 5)], 
+            (1, 6): [(2, 6), (3, 6), (2, 5)], 
+            (2, 0): [(3, 0), (3, 1)], 
+            (2, 3): [(2, 2), (2, 4), (1, 3), (3, 3), (1, 2), (3, 2)], 
+            (2, 7): [(3, 7)], 
+            (3, 4): [(4, 4)], 
+            (4, 3): [(4, 2), (4, 4), (4, 5), (4, 6), (4, 7), (3, 3), (5, 3), (3, 2), (2, 1), (1, 0), (5, 2), (6, 1), (7, 0), (5, 4)]}
+        
+
+        self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False)) 

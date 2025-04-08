@@ -143,5 +143,27 @@
     "Du bist wirklich ein starker Gegner!",
     "Ich gratuliere! Du hast das Spiel verdient gewonnen!",
     "Oh je… ich bin besiegt! Aber ich komme wieder!"
+  ],
+  "opening_commentary": [
+    "Ah, die ${opening}! Eine starke Wahl für den Anfang.",
+    "Oh, die ${opening} – das wird sicher spannend!",
+    "Mit der ${opening} fängt das Spiel ja gleich ordentlich an!",
+    "Die ${opening}? Interessant – das verspricht eine gute Partie.",
+    "Eine klassische ${opening} – da steckt viel Strategie drin.",
+    "Aha, die ${opening}. Ich mag, wohin das führt.",
+    "Du spielst also die ${opening}? Das wird interessant.",
+    "Die ${opening} – mutig und durchdacht!",
+    "Oho, ${opening}. Eine solide Entscheidung zum Start.",
+    "Das Spiel beginnt mit der ${opening}. Gefällt mir!",
+    "Schöne Wahl: ${opening}. Damit kann man arbeiten.",
+    "Die ${opening} – bewährt und voller Potenzial.",
+    "Ein Einstieg mit der ${opening}? Da steckt ein Plan dahinter!",
+    "Hm, die ${opening}. Die sieht man nicht jeden Tag.",
+    "Ich sehe, du bevorzugst die ${opening} – gute Wahl!",
+    "Mit der ${opening} bist du auf dem richtigen Weg.",
+    "Die ${opening}? Klingt nach einer spannenden Partie!",
+    "Oh, ${opening}. Eine stilvolle Eröffnung.",
+    "Die ${opening} bringt sofort Leben ins Spiel!",
+    "Na, das fängt ja gut an – die ${opening} ist ein echter Klassiker!"
   ]
 }
