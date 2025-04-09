@@ -40,6 +40,10 @@ let turnNumber = 0
 let opening;
 
 
+// Keeps track of emotion changes
+let sameEmotionCount;
+
+
 
 
 
@@ -102,10 +106,14 @@ async function playBestMove() {
 
 
 // Updates the robot's emotion, message, and image based on the change in evaluation value.
+// TODO Refactor
 function updateRobot(deltaValue) {
 
   // Get updated robot emotion
   emotion = getRobotEmotion(deltaValue);
+
+  console.log(emotion)
+  console.log(lastEmotion)
 
   if (turnNumber < 3) { // For the first few moves of the engine.
 
@@ -114,10 +122,29 @@ function updateRobot(deltaValue) {
 
   } else if ((emotion !== lastEmotion || turnNumber % 3 === 0) && turnNumber >= 10) {  // Change message all 3 moves or if emotion changes
 
+    if (emotion === lastEmotion) { // Check if Emotion changed
+      sameEmotionCount++
+    } else {
+      sameEmotionCount = 0;
+    }
+
+
     lastEmotion = emotion;
     message.value = robotText[emotion][Math.floor(Math.random() * robotText[emotion].length)];
     robotImage.value = getRobotImage(emotion)
     playSpeechSound()
+
+  } else if (emotion === lastEmotion) { // Random fun-fact if robots emotion have not changed for 4 engine moves
+
+    sameEmotionCount++
+    console.log(`Same Emotion + ${sameEmotionCount}`)
+
+    if (sameEmotionCount > 4 && turnNumber >= 10) {
+      message.value = robotText["fun_facts"][Math.floor(Math.random() * robotText["fun_facts"].length)];
+      emotion = "happy" // TODO isnt happy lol
+      sameEmotionCount = 0;
+      playSpeechSound()
+    }
 
   } else if (turnNumber === 8 || turnNumber === 9) { // Comment on opening on 8. or 9. move (depending on player-color)
 
@@ -209,7 +236,7 @@ function playCapturedSound() {
   if (!soundMuted.value) {
 
     console.log("Captured Sound")
-    const captured_sound = new Audio(`/sounds/piece-sounds/captured_sound_2.wav`)
+    const captured_sound = new Audio(`/sounds/piece-sounds/captured_sound_2.mp3`)
     captured_sound.volume = 0.075
     captured_sound.play();
   }
