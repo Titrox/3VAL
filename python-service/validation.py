@@ -669,6 +669,10 @@ def evaluate_position(chessboard):
     value = 0
     value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions TODO integrate in for loop
 
+    black_king_position = get_king_field(chessboard, False)
+    white_king_position = get_king_field(chessboard, True)
+
+
     pawn_counter = 0 # Keep track of pawns on field for estimation of game progress
     white_rooks = 0  
     black_rooks = 0
@@ -686,6 +690,9 @@ def evaluate_position(chessboard):
                 if piece.lower() == 'p':
                     pawn_counter += 1
 
+                    distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position)  
+                    value += king_tropism(distance, piece)
+
 
                 # Keep track of rooks on field  
 
@@ -695,6 +702,13 @@ def evaluate_position(chessboard):
                         white_rooks += 1
                     else:
                         black_rooks +=1
+
+                    # King Tropism
+
+                    distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position)  
+                    value += king_tropism(distance, piece)
+
+
 
 
                 # Center fields - Dynamic Control
@@ -717,12 +731,24 @@ def evaluate_position(chessboard):
                 if piece.lower() == 'n': # Knight detected
                     value += 5 * knight_outpost(chessboard, piece.isupper(), i, j)
 
+                    distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position)  
+                    value += king_tropism(distance, piece)
 
                 # Bad Bishop - Bishop blocked by own pawns
 
                 if piece.lower() == 'b': # Bishop detected
-                    logger.debug("Bishop")
                     value -= 3 * bad_bishop(chessboard, piece.isupper(), i, j)
+
+                    distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position) 
+                    value += king_tropism(distance, piece)
+
+                # Queen early development penalty
+
+                if piece.lower() == 'q:': # Queen detected
+                    value += early_queen_development_penalty(chessboard, piece.isupper(), pawn_counter)
+
+                    distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position) 
+                    value += king_tropism(distance, piece)
 
 
 
@@ -730,8 +756,6 @@ def evaluate_position(chessboard):
 
     value += white_rooks * (14 - pawn_counter) ;
     value -= black_rooks * (14 - pawn_counter)
-
-
 
 
     return value
@@ -748,6 +772,16 @@ def king_safety(chessboard, is_white, row, column):
 
     return king_safety_value
 
+
+def distance_to_king(row, column, king_position):
+
+    figure_x = column
+    figure_y = row
+
+    king_x = king_position[1]
+    king_y = king_position[0]
+
+    return  (abs(king_x - figure_x) + abs(king_y - figure_y))
 
 
 def virtual_mobility(chessboard, is_white, row, column):
@@ -783,6 +817,23 @@ def pawn_shield(chessboard, is_white, row, column):
 
     return pawn_shield_value if is_white else -pawn_shield_value
 
+
+
+def king_tropism(distance, piece):
+
+    piece_type = piece.lower()
+    is_white = piece.isupper()
+
+    factors = {
+        'q': 100,  # Queen: Sehr hoher Einfluss
+        'r': 80,   # Rook: Hoher Einfluss
+        'b': 60,   # Bishop: Mittlerer Einfluss
+        'n': 50,   # Knight: Mittlerer Einfluss, kann in kurzer Distanz sehr wirksam sein
+        'p': 20    # Pawn: Geringer Einfluss, kann in direkter Nähe gefährlich werden
+    }
+
+    value = round(factors.get(piece_type) / distance)
+    return value if is_white else -value
 
 
 # DYNAMIC CONTROL
@@ -870,6 +921,26 @@ def bad_bishop(chessboard, is_white, row, column):
     return blocking_pawns if is_white else -blocking_pawns
     
 
+# Returns penalty for early queen development depending on number of pawns 
+def early_queen_development_penalty(chessboard, is_white, pawn_counter):
+
+    if is_white:
+        queen_row = 0
+        queen = 'Q'
+    else:
+        queen_row = 7
+        queen = 'q'
+
+    if is_white:
+
+        if pawn_counter >= 14 and chessboard[queen_row][3] != queen: # Opening game - full penalty
+            return -30 if is_white else 30
+            
+
+        elif pawn_counter >= 10 and chessboard[queen_row][3] != queen: # Half pentalty
+            return -15 if is_white else 15
+
+        # Else no penalty
 
 
 # Class to represent the state of a chessboard
