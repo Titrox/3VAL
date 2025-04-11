@@ -43,6 +43,11 @@ let opening;
 let sameEmotionCount;
 
 
+const boardConfig = {
+  fen: "5k2/8/R7/8/P2p4/2p5/8/1K6 w - - 2 35"
+}
+
+
 
 
 
@@ -84,7 +89,7 @@ async function playBestMove() {
     let response = await axios.post('http://localhost:8080/best-move', request)
     const move_object = response.data
 
-    console.log("Engine move:" + move_object.value)
+    console.log(response.data)
 
     onReceiveMove(move_object.move);
 
@@ -333,6 +338,7 @@ function handleCheckmate(isMated) {
           :key="playerColor"
           @move="handleMove"
           @checkmate="handleCheckmate"
+          :board-config="boardConfig"
 
       />
     </div>

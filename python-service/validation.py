@@ -83,7 +83,7 @@ def fen_to_chessboard_object(fen):
     turn_right, castling, en_passant, halfmove, fullmove = information_fen.split(" ")
 
     # Create a chessboard state object with the position and castling/en passant rights
-    chessboard_object = Chessboard_state(chessboard, castling, en_passant)
+    chessboard_object = Chessboard_state(chessboard, castling, en_passant, None)
 
     logger.debug(chessboard)
     # logger.debug(f"Turn: {chessboard_object.turn_right}, Castling: {chessboard_object.castling}, En Passant: {chessboard_object.en_passant}, Halfmove: {chessboard_object.halfmove}, Fullmove: {chessboard_object.fullmove}")
@@ -417,14 +417,31 @@ def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
 def make_move(key, move, chessboard_object): 
 
     sim_chessboard = copy.deepcopy(chessboard_object.chessboard)  # Create a deep copy of the board
-
     piece = sim_chessboard[key[0]][key[1]]  # Get the piece to move
+
+    is_white = piece.isupper()
+
+    # PROMOTION
+
+    if ((move[0] == 0 or move[0] == 7) and piece.lower() == 'p'): # Pawn has to promote
+
+
+        logger.debug(f"Simulating: {move[0], move[1]}")
+        logger.debug("Pawn on last lane")
+
+        if is_white:
+            piece = 'Q'
+        else: 
+            piece = 'q'
+
 
     sim_chessboard[key[0]][key[1]] = 0  # Remove piece from original position
     sim_chessboard[move[0]][move[1]] = piece  # Place piece at new position
 
+    logger.debug(sim_chessboard)
+
     # Create a new chessboard state with the updated position
-    new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.castling, chessboard_object.en_passant)
+    new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.castling, chessboard_object.en_passant, piece)
     
     return new_chessboard_object
 
@@ -493,21 +510,26 @@ def pawn_moves(field_row, field_column, is_white, chessboard):
         start_row = 1
         direction = 1  # Black moves down
 
-    # One square forward if empty
-    if chessboard[forward_row][field_column] == 0:
-        possible_moves.append((forward_row, field_column))
 
-        # Two squares forward from starting position if both squares are empty
-        if field_row == start_row and chessboard[forward_row + direction][field_column] == 0:
-            possible_moves.append((forward_row + direction, field_column))
+   
 
-    # Check diagonal captures
-    for side in [-1, 1]:  # -1 = left, +1 = right
-        new_column = field_column + side
-        if 0 <= new_column <= 7:  # Check if within board boundaries
-            target_piece = chessboard[forward_row][new_column]
-            if target_piece != 0 and is_enemy(is_white, target_piece):  # Enemy piece there?
-                possible_moves.append((forward_row, new_column))
+    if in_bound(forward_row, field_column):
+
+        # One square forward if empty
+        if chessboard[forward_row][field_column] == 0:
+            possible_moves.append((forward_row, field_column))
+
+            # Two squares forward from starting position if both squares are empty
+            if field_row == start_row and chessboard[forward_row + direction][field_column] == 0:
+                possible_moves.append((forward_row + direction, field_column))
+
+        # Check diagonal captures
+        for side in [-1, 1]:  # -1 = left, +1 = right
+            new_column = field_column + side
+            if 0 <= new_column <= 7:  # Check if within board boundaries
+                target_piece = chessboard[forward_row][new_column]
+                if target_piece != 0 and is_enemy(is_white, target_piece):  # Enemy piece there?
+                    possible_moves.append((forward_row, new_column))
 
     return possible_moves
 
@@ -744,11 +766,12 @@ def evaluate_position(chessboard):
 
                 # Queen early development penalty
 
-                if piece.lower() == 'q:': # Queen detected
+                if piece.lower() == 'q': # Queen detected
                     value += early_queen_development_penalty(chessboard, piece.isupper(), pawn_counter)
 
                     distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position) 
                     value += king_tropism(distance, piece)
+                    logger.debug(f"{piece} Tropism value: {king_tropism(distance, piece)}")
 
 
 
@@ -931,25 +954,28 @@ def early_queen_development_penalty(chessboard, is_white, pawn_counter):
         queen_row = 7
         queen = 'q'
 
-    if is_white:
 
-        if pawn_counter >= 14 and chessboard[queen_row][3] != queen: # Opening game - full penalty
-            return -30 if is_white else 30
-            
-
-        elif pawn_counter >= 10 and chessboard[queen_row][3] != queen: # Half pentalty
-            return -15 if is_white else 15
+    if pawn_counter >= 14 and chessboard[queen_row][3] != queen: # Opening game - full penalty
+        logger.debug("You")
+        return -30 if is_white else 30
+        
+        
+    elif pawn_counter >= 10 and chessboard[queen_row][3] != queen: # Half pentalty
+        return -15 if is_white else 15
 
         # Else no penalty
 
+    else:
+        return -1
 
 # Class to represent the state of a chessboard
 class Chessboard_state:
 
-    def __init__(self, chessboard, castling, en_passant):
+    def __init__(self, chessboard, castling, en_passant, promotion):
         self.chessboard = chessboard  # 2D array representing the board
         self.castling = castling  # Castling rights
         self.en_passant = en_passant  # En passant target square
+        self.promotion = promotion
 
 
 # Run the Flask app if this file is executed directly
