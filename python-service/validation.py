@@ -669,12 +669,33 @@ def evaluate_position(chessboard):
     value = 0
     value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions TODO integrate in for loop
 
+    pawn_counter = 0 # Keep track of pawns on field for estimation of game progress
+    white_rooks = 0  
+    black_rooks = 0
+
     for i in range(8):
         for j in range (8):
 
             piece = chessboard[i][j]
 
             if piece != 0: # Only evaluate relevant fields (no empty fields)
+
+
+                # Keep track of pawns on field for estimation of game progress
+                
+                if piece.lower() == 'p':
+                    pawn_counter += 1
+
+
+                # Keep track of rooks on field  
+
+                if piece.lower() == 'r':
+
+                    if piece.isupper():
+                        white_rooks += 1
+                    else:
+                        black_rooks +=1
+
 
                 # Center fields - Dynamic Control
 
@@ -703,6 +724,12 @@ def evaluate_position(chessboard):
                     logger.debug("Bishop")
                     value -= 3 * bad_bishop(chessboard, piece.isupper(), i, j)
 
+
+
+    # Increase rook value depending on pawns on field
+
+    value += white_rooks * (14 - pawn_counter) ;
+    value -= black_rooks * (14 - pawn_counter)
 
 
 
