@@ -946,3 +946,216 @@ class Legal_move_tests(unittest.TestCase):
         
 
         self.assertEqual(expected, validation.generate_legal_moves(chessboard_object, False)) 
+
+
+
+
+
+class Dynamic_control_tests(unittest.TestCase):
+
+    def test_case_1(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,'q',0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.dynamic_control('q', chessboard, 3,3), -27)
+
+
+
+    def test_case_2(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,'b',0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.dynamic_control('b', chessboard, 3,3), -13)
+        
+    
+
+class Pawn_shield_tests(unittest.TestCase):
+
+    def test_case_1(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,'k',0],
+                [0,0,0,0,0,'p','p','p'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.pawn_shield(chessboard, False, 0,6), -3)
+
+
+    def test_case_2(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,'k',0],
+                [0,0,0,0,0,'p',0,'p'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.pawn_shield(chessboard, False, 0,6), -2)
+
+
+
+    def test_case_3(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                ['P','P','P',0,0,0,0,0],
+                [0,'K',0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.pawn_shield(chessboard, True, 7,1), 3)
+
+
+
+    def test_case_4(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'P','P',0,0,0,0,0],
+                [0,'K',0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.pawn_shield(chessboard, True, 7,1), 2)
+
+
+    
+    def test_case_5(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                ['P','P','P',0,0,0,0,0],
+                ['K',0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.pawn_shield(chessboard, True, 7,0), 2)
+
+
+
+
+class Virtual_mobility_tests(unittest.TestCase):
+
+    def test_case_1(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,'k',0],
+                [0,0,0,0,0,'p','p','p'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.virtual_mobility(chessboard, False, 0,6), -7)
+
+
+    def test_case_2(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,'k',0],
+                [0,0,0,0,0,'p',0,'p'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.virtual_mobility(chessboard, False, 0,6), -14)
+
+
+
+    def test_case_3(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                ['P','P','P',0,0,0,0,0],
+                [0,'K',0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,1), 7)
+
+
+
+    def test_case_4(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'P','P',0,0,0,0,0],
+                [0,'K',0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,1), 8)
+
+
+    
+    def test_case_5(self):
+    
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                ['P',0,'P',0,0,0,0,0],
+                ['K',0,0,0,0,0,0,0]
+            ]
+        
+        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,0), 14)
+        
+    

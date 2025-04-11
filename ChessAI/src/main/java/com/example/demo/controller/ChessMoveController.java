@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 public class ChessMoveController {
 
-    String flaskUrl = "http://localhost:5000/best-move";
+    String flaskUrl = "http://localhost:5000/";
 
     /**
      * Returns best possible move found by engine
@@ -32,7 +32,31 @@ public class ChessMoveController {
             header.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> requestEntity = new HttpEntity<>(currentBoardState, header);
 
-            response = restTemplate.postForEntity(flaskUrl, requestEntity, String.class);
+            response = restTemplate.postForEntity(String.format("%s/best-move", flaskUrl), requestEntity, String.class);
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            System.err.println("Request failed: " + e.getMessage());
+        }
+        return null;
+    }
+
+
+    @PostMapping("/evaluate-position")
+    public String evaluatePosition(@RequestBody String currentBoardState) {
+
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response;
+
+
+        try {
+            HttpHeaders header = new HttpHeaders();
+            header.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> requestEntity = new HttpEntity<>(currentBoardState, header);
+
+            response = restTemplate.postForEntity(String.format("%s/evaluate-position", flaskUrl), requestEntity, String.class);
 
             return response.getBody();
 

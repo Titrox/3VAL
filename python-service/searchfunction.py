@@ -65,7 +65,8 @@ def MINIMAX(chessboard_object, depth, is_white, move):
             return best_move
 
         # Return the best first move found at the current level
-        return Move_with_value(best_first_move.start, best_first_move.end, best_move.value)
+        best_move_value = validation.evaluate_position(validation.make_move(best_first_move.start, best_first_move.end, chessboard_object).chessboard) # Calc evaluation value of best move
+        return Move_with_value(best_first_move.start, best_first_move.end, best_move_value)
 
     # Minimizer's turn (black)
     else:
@@ -91,7 +92,8 @@ def MINIMAX(chessboard_object, depth, is_white, move):
             return best_move
 
         # Return the best first move found at the current level
-        return Move_with_value(best_first_move.start, best_first_move.end, best_move.value)
+        best_move_value = validation.evaluate_position(validation.make_move(best_first_move.start, best_first_move.end, chessboard_object).chessboard) # Calc evaluation value of best move
+        return Move_with_value(best_first_move.start, best_first_move.end, best_move_value)
 
 
 # Class to represent a chess move with start and end positions

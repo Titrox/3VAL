@@ -16,10 +16,18 @@ app = Flask(__name__)
 
 Pieces = constants.Pieces
 
+
+
+###
+#
+# API
+#
+###
+
 # Flask route to get the best move using the minimax algorithm
 # Returns a dictionary with 'from' and 'to' fields
 @app.route('/best-move', methods=['POST'])
-def get_best_move():
+def get_best_move_api():
         
     data = request.get_json()
 
@@ -31,26 +39,37 @@ def get_best_move():
 
     chessboard_object = fen_to_chessboard_object(formatted_fen)  # Convert FEN to chessboard object
     
-    logger.debug(chessboard_object.chessboard)
+    # logger.debug(chessboard_object.chessboard)
 
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 2
     best_move = searchfunction.MINIMAX(chessboard_object, 2, is_white, searchfunction.Move(0,0))
-    logger.debug(best_move.to_dict)
+   
+    # logger.debug(best_move.to_dict)
 
     fen_to_chessboard_object(formatted_fen)
 
     return best_move.to_dict()  # Return the best move found
 
 
-# Evaluates current chessboard position
-def evaluate_position(chessboard):
 
-    value = 0
-    value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions
 
-    return value
+
+@app.route('/evaluate-position', methods=['POST'])
+def evaluate_position_api():
+
+    data = request.get_json()
+    logger.debug(data)
+    fen = data["fen"]
+
+    chessboard = fen_to_array(fen)
+    
+    
+    return str(evaluate_position(chessboard))
+    
+
+    
 
 
 # Convert FEN string to a chessboard object
@@ -220,9 +239,10 @@ def generate_legal_moves(chessboard_object, is_white):
     castling_moves = legal_castling_moves(chessboard_object.castling, chessboard_object.chessboard, is_white)
     king_field = get_king_field(chessboard, is_white)  # Find the king's position
     
-     # Get legal en passant moves if available
+    # Get legal en passant moves if available
     en_passant_moves = legal_en_passant_moves(chessboard_object.en_passant, chessboard, is_white)
-    logger.debug(f"En Passant: {en_passant_moves}")
+    
+    # logger.debug(f"En Passant: {en_passant_moves}")
 
     # Get all pseudo-legal moves
     all_moves = generate_moves(chessboard, is_white)
@@ -247,7 +267,8 @@ def generate_legal_moves(chessboard_object, is_white):
     if en_passant_moves:
         legal_moves.update(en_passant_moves)
 
-    logger.debug(legal_moves)
+    # logger.debug(legal_moves)
+
     return legal_moves
 
 
@@ -294,8 +315,7 @@ def legal_castling_moves(possible_castling, chessboard, is_white):
     else:  # Black castling
 
             if "q" in possible_castling:  # Queenside castling
-                logger.debug("q detected")
-
+                
                 # Check if squares between king and rook are empty
                 Q_possible = chessboard[0][1] == 0 and chessboard[0][2] == 0 and chessboard[0][3] == 0  
 
@@ -347,12 +367,10 @@ def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
         converted_row = 7 - (int(en_passant_move[1]) - 1) # e.g., '6' -> row 2 (0-indexed)
 
         converted_en_passant_move = (converted_row, converted_column)
-        logger.debug(converted_en_passant_move)
 
         # If the en passant target row is the 5th rank (for black's pawn capture)
         if converted_row == 5:
             # Check for black pawns that can make the en passant capture
-            logger.debug("CHECK FIELDS")
             for field in [-1, +1]: # Check the squares to the left and right of the target square
                 # Check if the adjacent square contains a black pawn and is within the board boundaries
                 if in_bound(converted_row - 1, converted_column + field) and chessboard[converted_row - 1][converted_column + field] == 'p':
@@ -364,15 +382,11 @@ def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
 
                     sim_chessboard[converted_row - 1][converted_column] = 0 # remove captured white pawn
 
-                    logger.debug(f"Checking p on{converted_row - 1}{converted_column + field} with Field = {field}")
-                    logger.debug(sim_chessboard)
                     # Check if the move leaves the black king in check
                     if not is_check(sim_chessboard, is_white):
                         # If the move is legal, add it to the possible en passant moves
                         # The key is the starting position of the capturing pawn, the value is a list containing the target square
-                        en_passant_moves.setdefault((converted_row - 1, converted_column + field), []).append(converted_en_passant_move)
-
-            logger.debug("DONE")            
+                        en_passant_moves.setdefault((converted_row - 1, converted_column + field), []).append(converted_en_passant_move)    
 
         # If the en passant target row is the 3rd rank (for white's pawn capture)
         elif converted_row == 3:
@@ -640,6 +654,195 @@ def in_bound(row, column):
 # Check if a piece is an enemy piece based on color
 def is_enemy(is_white, figure):
     return str.islower(figure) if is_white else str.isupper(figure)
+
+
+
+###
+#
+# EVALUATION FUNCTION
+#
+###
+
+    # Evaluates current chessboard position
+def evaluate_position(chessboard):
+
+    value = 0
+    value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions TODO integrate in for loop
+
+    for i in range(8):
+        for j in range (8):
+
+            piece = chessboard[i][j]
+
+            if piece != 0: # Only evaluate relevant fields (no empty fields)
+
+                # Center fields - Dynamic Control
+
+                if 2 < i < 5 and 2 < j < 5: 
+                    value += 3 * dynamic_control(piece, chessboard, i, j)
+
+
+                # King Safety
+
+                if piece.lower() == 'k': # King detected
+                    value += king_safety(chessboard, piece.isupper(), i, j)
+
+
+                # EVALUATION OF PIECES
+
+
+                # Outpost - Knight defended by pawn
+
+                if piece.lower() == 'n': # Knight detected
+                    value += 5 * knight_outpost(chessboard, piece.isupper(), i, j)
+
+
+                # Bad Bishop - Bishop blocked by own pawns
+
+                if piece.lower() == 'b': # Bishop detected
+                    logger.debug("Bishop")
+                    value -= 3 * bad_bishop(chessboard, piece.isupper(), i, j)
+
+
+
+
+
+    return value
+
+
+# KING SAFETY
+
+def king_safety(chessboard, is_white, row, column):
+
+    king_safety_value = 0
+    
+    king_safety_value += 6 * pawn_shield(chessboard, is_white, row, column)
+    king_safety_value +=  virtual_mobility(chessboard, is_white, row, column)
+
+    return king_safety_value
+
+
+
+def virtual_mobility(chessboard, is_white, row, column):
+
+    possible_queen_moves = []
+    possible_queen_moves = queen_moves(row, column, is_white, chessboard)
+    
+
+    return -len(possible_queen_moves) if is_white else len(possible_queen_moves)
+
+
+
+        
+def pawn_shield(chessboard, is_white, row, column):
+
+    pawn_shield_value = 0
+
+    if is_white:
+        king_front_row = row -1
+        pawn = 'P'
+    else:
+        king_front_row = row + 1
+        pawn = 'p'
+
+
+    for pawn_position in [1,0,-1]: # Check relevant fields vor pawns
+
+        if in_bound(king_front_row, column + pawn_position):
+
+            if chessboard[king_front_row][column + pawn_position] == pawn:
+                pawn_shield_value += 1      
+
+
+    return pawn_shield_value if is_white else -pawn_shield_value
+
+
+
+# DYNAMIC CONTROL
+
+
+
+def dynamic_control(piece, chessboard, row, column):
+
+    is_white_figure = piece.isupper()
+    possible_moves = [] # All possible moves for figure on field (row, column)
+
+
+   
+    if is_white_figure: 
+
+        match piece:
+            case 'P': possible_moves.extend(pawn_moves(row, column, True, chessboard))
+            case 'B': possible_moves.extend(bishop_moves(row, column, True, chessboard))
+            case 'N': possible_moves.extend(knight_moves(row, column, True, chessboard))
+            case 'R': possible_moves.extend(rook_moves(row, column, True, chessboard))
+            case 'Q': possible_moves.extend(queen_moves(row, column, True, chessboard))
+            case 'K': possible_moves.extend(king_moves(row, column, True, chessboard))
+
+    else: 
+
+        match piece:
+            case 'p': possible_moves.extend(pawn_moves(row, column, False, chessboard))
+            case 'b': possible_moves.extend(bishop_moves(row, column, False, chessboard))
+            case 'n': possible_moves.extend(knight_moves(row, column, False, chessboard))
+            case 'r': possible_moves.extend(rook_moves(row, column, False, chessboard))
+            case 'q': possible_moves.extend(queen_moves(row, column, False, chessboard))
+            case 'k': possible_moves.extend(king_moves(row, column, False, chessboard))
+            
+    
+    
+    return len(possible_moves) if is_white_figure else -len(possible_moves)
+
+
+
+# EVALUATION OF PIECES
+
+
+
+# Returns 1 or -1 if knight is defended by pawn depending on color, else 0
+def knight_outpost(chessboard, is_white, row, column):
+
+    if is_white:
+        behind_row = row + 1
+        pawn = 'P'
+    else:
+        behind_row = row - 1
+        pawn = 'p'
+
+
+    for pawn_position in [1, -1]:
+
+        if in_bound(behind_row, column + pawn_position) and chessboard[behind_row][column + pawn_position] == pawn:
+            return 1 if is_white else -1 
+    
+    return 0
+
+
+# Returns number of pawns blocking bishop
+def bad_bishop(chessboard, is_white, row, column):
+
+    blocking_pawns = 0
+
+    if is_white:
+        front_row = row - 1
+        pawn = 'P'
+    else:
+        front_row = row + 1
+        pawn = 'p'
+
+
+    for pawn_position in [1, -1]:
+
+        if in_bound(front_row, column + pawn_position) and chessboard[front_row][column + pawn_position] == pawn:
+            
+            blocking_pawns += 1
+
+    
+    logger.debug(blocking_pawns)
+
+    return blocking_pawns if is_white else -blocking_pawns
+    
+
 
 
 # Class to represent the state of a chessboard

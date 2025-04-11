@@ -39,7 +39,6 @@ let turnNumber = 0
 // Opening played by player
 let opening;
 
-
 // Keeps track of emotion changes
 let sameEmotionCount;
 
@@ -58,7 +57,6 @@ function getRobotImage(emotion) {
   const randomNumber = Math.floor(Math.random() * 2) + 1; // Generates either 1 or 2.
   return `/images/${emotion}_${randomNumber}.png`;
 }
-
 
 // Function to determine the robot's emotion based on the change in evaluation value.
 function getRobotEmotion(deltaValue) {
@@ -85,15 +83,16 @@ async function playBestMove() {
   try {
     let response = await axios.post('http://localhost:8080/best-move', request)
     const move_object = response.data
-    console.log(move_object)
 
-
+    console.log("Engine move:" + move_object.value)
 
     onReceiveMove(move_object.move);
 
     if (move_object.value !== "-inf" && move_object.value !== "inf") {
 
+
       deltaValue = lastValue.value - move_object.value;
+      console.log("Delta value:" + deltaValue)
       lastValue.value = move_object.value
 
       updateRobot(deltaValue);
@@ -101,6 +100,26 @@ async function playBestMove() {
 
   } catch (e) {
     console.error(e.message);
+  }
+}
+
+
+async function evaluatePosition() {
+
+  const fen = boardApi?.getFen().split(" ")[0]
+
+  const request = {
+    fen: fen
+  }
+
+  try {
+
+    const response = await axios.post("http://localhost:8080/evaluate-position", request)
+    lastValue.value = parseFloat(response.data)
+    return response.data
+
+  } catch (e) {
+    console.log(e.message)
   }
 }
 
@@ -141,7 +160,8 @@ function updateRobot(deltaValue) {
 
     if (sameEmotionCount > 4 && turnNumber >= 10) {
       message.value = robotText["fun_facts"][Math.floor(Math.random() * robotText["fun_facts"].length)];
-      emotion = "happy" // TODO isnt happy lol
+      emotion = "happy"
+      robotImage.value = getRobotImage("happy")
       sameEmotionCount = 0;
       playSpeechSound()
     }
@@ -151,6 +171,7 @@ function updateRobot(deltaValue) {
     const rawMessage = robotText["opening_commentary"][Math.floor(Math.random() * robotText["opening_commentary"].length)];
 
     message.value = rawMessage.replace("${opening}", opening)
+    emotion = "happy"
     robotImage.value = getRobotImage("happy")
     playSpeechSound()
 
@@ -204,9 +225,12 @@ async function handleMove(move) {
   }
 
   if (boardApi?.getTurnColor() !== playerColor.value) {
+    console.log("Player move:" + await evaluatePosition()) // Calc evaluation value after player move
     await playBestMove();
   }
 }
+
+
 
 
 // Resets the robot's message and image to the initial state and plays a speech sound.

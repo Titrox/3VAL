@@ -6,7 +6,7 @@ const audio = new Audio('/music/8-bit.mp3');
 
 
 audio.loop = true;
-audio.volume = 0.5
+audio.volume = 0.3
 let soundMuted = ref(globalState.soundMuted);
 
 
