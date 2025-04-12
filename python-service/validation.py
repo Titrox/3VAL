@@ -28,6 +28,10 @@ Pieces = constants.Pieces
 # Returns a dictionary with 'from' and 'to' fields
 @app.route('/best-move', methods=['POST'])
 def get_best_move_api():
+
+    # Define infinity values for minimax algorithm
+    INFINITY = float('inf')
+    NEG_INFINITY = float('-inf')
         
     data = request.get_json()
 
@@ -44,7 +48,7 @@ def get_best_move_api():
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 2
-    best_move = searchfunction.MINIMAX(chessboard_object, 2, is_white, searchfunction.Move(0,0))
+    best_move = searchfunction.MINIMAX(chessboard_object, 3, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
    
     # logger.debug(best_move.to_dict)
 
@@ -426,8 +430,8 @@ def make_move(key, move, chessboard_object):
     if ((move[0] == 0 or move[0] == 7) and piece.lower() == 'p'): # Pawn has to promote
 
 
-        logger.debug(f"Simulating: {move[0], move[1]}")
-        logger.debug("Pawn on last lane")
+        #logger.debug(f"Simulating: {move[0], move[1]}")
+        #logger.debug("Pawn on last lane")
 
         if is_white:
             piece = 'Q'
@@ -438,7 +442,6 @@ def make_move(key, move, chessboard_object):
     sim_chessboard[key[0]][key[1]] = 0  # Remove piece from original position
     sim_chessboard[move[0]][move[1]] = piece  # Place piece at new position
 
-    logger.debug(sim_chessboard)
 
     # Create a new chessboard state with the updated position
     new_chessboard_object = Chessboard_state(sim_chessboard, chessboard_object.castling, chessboard_object.en_passant, piece)
@@ -771,7 +774,7 @@ def evaluate_position(chessboard):
 
                     distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position) 
                     value += king_tropism(distance, piece)
-                    logger.debug(f"{piece} Tropism value: {king_tropism(distance, piece)}")
+                    #logger.debug(f"{piece} Tropism value: {king_tropism(distance, piece)}")
 
 
 
@@ -938,8 +941,7 @@ def bad_bishop(chessboard, is_white, row, column):
             
             blocking_pawns += 1
 
-    
-    logger.debug(blocking_pawns)
+
 
     return blocking_pawns if is_white else -blocking_pawns
     
@@ -956,7 +958,7 @@ def early_queen_development_penalty(chessboard, is_white, pawn_counter):
 
 
     if pawn_counter >= 14 and chessboard[queen_row][3] != queen: # Opening game - full penalty
-        logger.debug("You")
+        #logger.debug("You")
         return -30 if is_white else 30
         
         

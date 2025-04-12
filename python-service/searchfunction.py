@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 
 # Minimax algorithm implementation to find the best move
-def MINIMAX(chessboard_object, depth, is_white, move_leading_here): 
+def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
     global counter
     counter += 1
     logger.debug(counter)
@@ -28,50 +28,57 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here):
         if reason == 0:  # Checkmate
             value = INFINITY if is_white else NEG_INFINITY
         else:  # Stalemate
-            value = 0 
-
+            value = 0
         return Move_with_value(move_leading_here.start, move_leading_here.end, value, None)
 
     if depth == 0:  # Max search depth reached
         return Move_with_value(move_leading_here.start, move_leading_here.end,
-                               validation.evaluate_position(chessboard),
-                               chessboard_object.promotion)
+                                 validation.evaluate_position(chessboard),
+                                 chessboard_object.promotion)
 
     if is_white:  # Maximizing player (White)
         best_move = Move_with_value(None, None, NEG_INFINITY, None)
+        legal_moves = validation.generate_legal_moves(chessboard_object, is_white)
 
-        # Generate and iterate over all legal moves for White
-        for start, value_list in validation.generate_legal_moves(chessboard_object, is_white).items():
+        for start, value_list in legal_moves.items():
             for end in value_list:
                 new_chessboard_object = validation.make_move(start, end, chessboard_object)
                 current_promotion = new_chessboard_object.promotion
                 action_taken = Move(start, end)
 
-                # Recursive call for Black
-                result = MINIMAX(new_chessboard_object, depth - 1, False, action_taken)
+                result = MINIMAX(new_chessboard_object, depth - 1, not is_white, action_taken, alpha, beta)
 
-                # Update best move if a better one is found
                 if result.value > best_move.value:
                     best_move = Move_with_value(start, end, result.value, current_promotion)
+
+                alpha = max(alpha, result.value)
+
+                if beta <= alpha:
+                    logger.debug(f"White pruned at depth {depth}, alpha={alpha}, beta={beta}")
+                    return best_move  # Prune: Stop searching further down this path
 
         return best_move
 
     else:  # Minimizing player (Black)
         best_move = Move_with_value(None, None, INFINITY, None)
+        legal_moves = validation.generate_legal_moves(chessboard_object, False) # Corrected: is_white to False
 
-        # Generate and iterate over all legal moves for Black
-        for start, value_list in validation.generate_legal_moves(chessboard_object, is_white).items():
+        for start, value_list in legal_moves.items():
             for end in value_list:
                 new_chessboard_object = validation.make_move(start, end, chessboard_object)
                 current_promotion = new_chessboard_object.promotion
                 action_taken = Move(start, end)
 
-                # Recursive call for White
-                result = MINIMAX(new_chessboard_object, depth - 1, True, action_taken)
+                result = MINIMAX(new_chessboard_object, depth - 1, not is_white, action_taken, alpha, beta)
 
-                # Update best move if a worse (lower) value is found
                 if result.value < best_move.value:
                     best_move = Move_with_value(start, end, result.value, current_promotion)
+
+                beta = min(beta, result.value) # Corrected beta update
+
+                if beta <= alpha:
+                    logger.debug(f"Black pruned at depth {depth}, alpha={alpha}, beta={beta}")
+                    return best_move  # Prune: Stop searching further down this path
 
         return best_move
 
@@ -88,7 +95,7 @@ class Move_with_value(Move):
     def __init__(self, start, end, value, promotion):
         super().__init__(start, end)
         self.value = value
-        self.promotion = promotion  # 'q', 'r', 'n', 'b' or None
+        self.promotion = promotion  # currently only 'q',
 
     def to_chess_notation(self, position):
         if position is None:

@@ -43,9 +43,6 @@ let opening;
 let sameEmotionCount;
 
 
-const boardConfig = {
-  fen: "5k2/8/R7/8/P2p4/2p5/8/1K6 w - - 2 35"
-}
 
 
 
@@ -318,6 +315,10 @@ function handleCheckmate(isMated) {
 
   <div class="main-container">
 
+
+
+
+
     <div class="button-container container--figure-text-container">
       <div class="container container--figure-container"><img :src="robotImage" alt="roboter-glücklich"> </div>
       <div class="container container--text-container">{{ message }}</div>
@@ -338,7 +339,7 @@ function handleCheckmate(isMated) {
           :key="playerColor"
           @move="handleMove"
           @checkmate="handleCheckmate"
-          :board-config="boardConfig"
+
 
       />
     </div>
