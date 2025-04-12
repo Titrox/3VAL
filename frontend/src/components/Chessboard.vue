@@ -314,8 +314,7 @@ function handleCheckmate(isMated) {
 <template>
 
   <div class="main-container">
-
-
+    
 
 
 

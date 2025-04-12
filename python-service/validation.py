@@ -48,7 +48,7 @@ def get_best_move_api():
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 2
-    best_move = searchfunction.MINIMAX(chessboard_object, 3, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
+    best_move = searchfunction.MINIMAX(chessboard_object, 4, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
    
     # logger.debug(best_move.to_dict)
 
@@ -418,16 +418,16 @@ def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
     
 
 # Simulate a move and return the resulting board state
-def make_move(key, move, chessboard_object): 
+def make_move(start, end, chessboard_object): 
 
     sim_chessboard = copy.deepcopy(chessboard_object.chessboard)  # Create a deep copy of the board
-    piece = sim_chessboard[key[0]][key[1]]  # Get the piece to move
+    piece = sim_chessboard[start[0]][start[1]]  # Get the piece to move
 
     is_white = piece.isupper()
 
     # PROMOTION
 
-    if ((move[0] == 0 or move[0] == 7) and piece.lower() == 'p'): # Pawn has to promote
+    if ((end[0] == 0 or end[0] == 7) and piece.lower() == 'p'): # Pawn has to promote
 
 
         #logger.debug(f"Simulating: {move[0], move[1]}")
@@ -439,8 +439,8 @@ def make_move(key, move, chessboard_object):
             piece = 'q'
 
 
-    sim_chessboard[key[0]][key[1]] = 0  # Remove piece from original position
-    sim_chessboard[move[0]][move[1]] = piece  # Place piece at new position
+    sim_chessboard[start[0]][start[1]] = 0  # Remove piece from original position
+    sim_chessboard[end[0]][end[1]] = piece  # Place piece at new position
 
 
     # Create a new chessboard state with the updated position
@@ -958,7 +958,7 @@ def early_queen_development_penalty(chessboard, is_white, pawn_counter):
 
 
     if pawn_counter >= 14 and chessboard[queen_row][3] != queen: # Opening game - full penalty
-        #logger.debug("You")
+        logger.debug("You")
         return -30 if is_white else 30
         
         
