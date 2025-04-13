@@ -1,34 +1,31 @@
 <script setup>
-import Chessboard from "./components/Chessboard.vue";
-import Background from "./components/Background.vue";
+import Background from "frontend/src/components/Background.vue";
+import { useRouter } from 'vue-router'
 import Music from "./components/Music.vue";
+
+
+const router = useRouter()
+
+function goToNormalMode() {
+  router.push("/normal-mode");
+}
+
+function goToDebugMode() {
+  router.push("/debug-mode");
+}
 
 </script>
 
 <template>
   <Background>
-    <div class="main-container">
-      <Chessboard />
-    </div>
     <div class="music-container" ref="musicContainer">
-      <Music/>
+      <Music />
     </div>
+    <router-view/>
   </Background>
 </template>
 
 <style scoped>
-
-/* CONTAINER */
-
-.main-container {
-  height: 100vh;
-  width: 100vw;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-}
 
 .music-container {
   position: absolute;

@@ -15,6 +15,7 @@
     "frontend": "file:",
     "pixi.js": "^8.9.1",
     "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
     "vue3-chessboard": "^1.3.3",
     "vue3-pixi": "^0.9.6"
   },

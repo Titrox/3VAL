@@ -42,41 +42,6 @@ let opening;
 // Keeps track of emotion changes
 let sameEmotionCount;
 
-// Text on the debug button
-let debugText = ref("DEBUG")
-
-// Store IntervalId for glitch effect of debug button
-let intervalId = ref(null)
-
-//
-// DEBUG BUTTON
-//
-
-function generateRandomString(length = 5) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.<>?'
-  let result = ''
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * chars.length)
-    result += chars[randomIndex]
-  }
-  return result
-}
-
-function startAction() {
-  if (intervalId.value == null) {
-    intervalId.value = setInterval(() => {
-      debugText.value = generateRandomString()
-    }, 70)
-  }
-}
-
-function stopAction() {
-  clearInterval(intervalId.value)
-  intervalId.value = null
-  debugText.value = "DEBUG"
-}
-
-
 
 
 // Function to receive a move from an external source (e.g., socket, server) and apply it to the chessboard.
@@ -345,8 +310,6 @@ function handleCheckmate(isMated) {
 
   <div class="main-container">
 
-
-
     <div class="button-container container--figure-text-container">
       <div class="container container--figure-container"><img :src="robotImage" alt="roboter-glücklich"> </div>
       <div class="container container--text-container">{{ message }}</div>
@@ -376,16 +339,6 @@ function handleCheckmate(isMated) {
       <button class="button button--reset" @click="resetBoard">Zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
       <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
       <button class="button button--switch" @click="togglePlayerColor">Seite wechseln <i class="bi bi-arrow-left-right"></i></button>
-      <button
-          class="button button--debug"
-          @click="togglePlayerColor"
-          @mouseover="startAction"
-          @mouseleave="stopAction"
-      >
-
-        {{ debugText }}
-
-      </button>
     </div>
   </div>
 </template>

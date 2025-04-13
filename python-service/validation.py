@@ -73,7 +73,11 @@ def evaluate_position_api():  # pragma: no cover
     return str(evaluate_position(chessboard))
     
 
-    
+###
+#
+# HANDLE FEN
+#
+###    
 
 
 # Convert FEN string to a chessboard object
@@ -121,6 +125,15 @@ def fen_to_array(fen):
             break
 
     return chessboard
+
+
+
+###
+#
+# PSQT
+#
+###    
+
 
 
 # Calculate the total value of a position based on piece values and piece-square tables
@@ -193,6 +206,14 @@ def get_queen_psqt(is_white):
         return constants.Psqt.QUEEN_PSQT
     else:
         return constants.Psqt.QUEEN_PSQT_BLACK
+    
+
+###
+#
+# MOVE GENERATION
+#
+###    
+
 
 
 # Generate all possible moves for each piece of the given color
@@ -456,56 +477,6 @@ def make_move(start, end, chessboard_object):
     
     return new_chessboard_object
 
-
-# Check if the king of the given color is in check
-def is_check(chessboard, is_white):
-
-    # Get all possible moves by the opponent
-    all_opponent_moves = generate_moves(chessboard, not is_white)
-    king_field = get_king_field(chessboard, is_white)  # Find the king's position
-
-    # Check if any opponent move can capture the king
-    for key, value in all_opponent_moves.items():
-        
-        if (len(value) != 0): 
-           
-            for move in value: 
-
-                if move == king_field:  # King is attacked -> check
-                    return True
-                
-    return False  # King is not attacked            
- 
-
-# Check if the game is over (checkmate or stalemate)
-def game_over(chessboard_object, is_white):
-
-    legal_moves = len(generate_legal_moves(chessboard_object, is_white)) 
-
-    if legal_moves != 0:  # If there are legal moves, game continues
-        return False, None
-    
-    elif is_check:  # No legal moves and king in check = checkmate
-        return True, 0
-    
-    else:  # No legal moves and king not in check = stalemate
-        return True, 1
-    
-
-# Find the position of the king for a given color
-def get_king_field(chessboard, is_white):
-
-    for i in range(8):
-        for j in range(8):
-
-            if is_white and chessboard[i][j] == 'K':  # White king
-                return (i,j)
-
-            elif not is_white and chessboard[i][j] == 'k':  # Black king
-                return (i,j) 
-            
-    return (-1,-1)  # No king found (should never happen in a legal position)
-
     
 # Generate all possible pawn moves
 def pawn_moves(field_row, field_column, is_white, chessboard):
@@ -677,6 +648,65 @@ def king_moves(field_row, field_column, is_white, chessboard):
                 possible_moves.append((row, column))
 
     return possible_moves
+
+
+
+###
+#
+# HELPER FUNCTIONS
+#
+###    
+
+
+# Check if the king of the given color is in check
+def is_check(chessboard, is_white):
+
+    # Get all possible moves by the opponent
+    all_opponent_moves = generate_moves(chessboard, not is_white)
+    king_field = get_king_field(chessboard, is_white)  # Find the king's position
+
+    # Check if any opponent move can capture the king
+    for key, value in all_opponent_moves.items():
+        
+        if (len(value) != 0): 
+           
+            for move in value: 
+
+                if move == king_field:  # King is attacked -> check
+                    return True
+                
+    return False  # King is not attacked            
+ 
+
+# Check if the game is over (checkmate or stalemate)
+def game_over(chessboard_object, is_white):
+
+    legal_moves = len(generate_legal_moves(chessboard_object, is_white)) 
+
+    if legal_moves != 0:  # If there are legal moves, game continues
+        return False, None
+    
+    elif is_check:  # No legal moves and king in check = checkmate
+        return True, 0
+    
+    else:  # No legal moves and king not in check = stalemate
+        return True, 1
+    
+
+# Find the position of the king for a given color
+def get_king_field(chessboard, is_white):
+
+    for i in range(8):
+        for j in range(8):
+
+            if is_white and chessboard[i][j] == 'K':  # White king
+                return (i,j)
+
+            elif not is_white and chessboard[i][j] == 'k':  # Black king
+                return (i,j) 
+            
+    return (-1,-1)  # No king found (should never happen in a legal position)
+
         
 
 # Check if a position is within the board boundaries
