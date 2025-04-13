@@ -530,6 +530,10 @@ class Rook_move_tests(unittest.TestCase):
 
 class Castling_move_tests(unittest.TestCase):
 
+    #
+    # BLACK
+    #
+
     def test_case_1(self):
         chessboard = [
                 ['r',0,0,0,'k',0,0,'r'],
@@ -600,7 +604,7 @@ class Castling_move_tests(unittest.TestCase):
         self.assertEqual(expected, validation.legal_castling_moves("-", chessboard, False))
 
 
-    def test_case_4(self):
+    def test_case_5(self):
 
         chessboard = [
                 ['r',0,0,0,'k',0,0,'r'],
@@ -619,7 +623,105 @@ class Castling_move_tests(unittest.TestCase):
 
 
 
+    #
+    # WHITE
+    #
+
+    def test_case_6(self):
+            chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    ['R',0,0,0,'K',0,0,'R']
+                ]
+
+            expected =  [(7, 2), (7, 6)]
+
+            self.assertEqual(expected, validation.legal_castling_moves("QK", chessboard, True))
+
+
+    def test_case_7(self):
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    ['R',0,0,0,'K',0,0,'R']
+                ]
+
+        expected =  [(7, 6)]
+
+        self.assertEqual(expected, validation.legal_castling_moves("K", chessboard, True))
+
+
+
+    def test_case_8(self):
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    ['R',0,0,0,'K',0,0,'R']
+                ]
+
+        expected =  [(7, 2)]
+
+        self.assertEqual(expected, validation.legal_castling_moves("Q", chessboard, True))
+
+
+
+    def test_case_9(self):
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    ['R',0,0,0,'K',0,0,'R']
+                ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.legal_castling_moves("-", chessboard, True))
+
+
+    def test_case_10(self):
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,'q'],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                ['R',0,0,0,'K',0,0,'R']
+            ]
+
+        expected = []
+
+        self.assertEqual(expected, validation.legal_castling_moves("K", chessboard, False))
+
+
+
 class En_passant_move_tests(unittest.TestCase):
+
+
+    #
+    # BLACK
+    #
 
     def test_case_1(self):
         
@@ -688,6 +790,80 @@ class En_passant_move_tests(unittest.TestCase):
         expected =  {}
 
         self.assertEqual(expected, validation.legal_en_passant_moves("c3", chessboard, False))
+
+    #
+    # WHITE
+    #
+
+
+    def test_case_5(self):
+        
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'P','p',0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+
+        expected =  {(3, 1): [(2, 2)]}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c6", chessboard, True))
+
+
+    def test_case_6(self):
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'P','p','P',0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        expected =  {(3, 1): [(2, 2)], (3, 3): [(2, 2)]}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c6", chessboard, True))
+
+
+    def test_case_7(self):
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,'K',0,0,0,0,0,0],
+                [0,'P','p','P',0,0,0,0],
+                [0,'q',0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        expected =  {(3, 3): [(2, 2)]}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("c6", chessboard, True))
+
+
+    def test_case_8(self):
+
+
+        chessboard = [
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,'b',0,0,'q',0],
+                [0,0,0,0,'P','p','P',0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,'K',0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+            ]
+        expected =  {}
+
+        self.assertEqual(expected, validation.legal_en_passant_moves("f6", chessboard, True))
 
 
 
@@ -987,6 +1163,10 @@ class Dynamic_control_tests(unittest.TestCase):
         
     
 
+#
+# KING SAFETY
+#
+
 class Pawn_shield_tests(unittest.TestCase):
 
     def test_case_1(self):
@@ -1159,3 +1339,349 @@ class Virtual_mobility_tests(unittest.TestCase):
         self.assertEqual(validation.virtual_mobility(chessboard, True, 7,0), -14)
         
     
+#
+# EVALUATION OF PIECES
+#
+
+
+class Knight_outpost_tests(unittest.TestCase):
+
+
+    #
+    # BLACK
+    #
+
+
+    def test_case_1(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,'p',0,0,0,0,0,0],
+                    [0,0,'n',0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.knight_outpost(chessboard,False, 2, 2), -1)
+
+
+    def test_case_2(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,'n',0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.knight_outpost(chessboard,False, 2, 2), 0)
+
+
+    #
+    # WHITE
+    #
+
+    def test_case_3(self):
+
+            chessboard = [
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,'N',0,0,0,0,0],
+                        [0,'P',0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0],
+                        [0,0,0,0,0,0,0,0]
+                    ]
+            
+            self.assertEqual(validation.knight_outpost(chessboard,True, 2, 2), 1)
+
+
+    def test_case_4(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,'N',0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.knight_outpost(chessboard,True, 2, 2), 0)
+    
+
+
+class Bad_bishop_tests(unittest.TestCase):
+
+    #
+    # BLACK
+    #
+
+
+    def test_case_1(self):
+
+        chessboard = [
+                    [0,'b',0,0,0,0,0,0],
+                    ['p',0,'p',0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.bad_bishop(chessboard, False, 0, 1), 2)
+
+
+
+    def test_case_2(self):
+
+        chessboard = [
+                    [0,'b',0,0,0,0,0,0],
+                    [0,0,'p',0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.bad_bishop(chessboard, False, 0, 1), 1)
+
+
+    def test_case_3(self):
+
+        chessboard = [
+                    [0,'b',0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.bad_bishop(chessboard, False, 0, 1), 0)
+
+
+
+    #
+    # WHITE
+    #
+
+
+    def test_case_4(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    ['P',0,'P',0,0,0,0,0],
+                    [0,'B',0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.bad_bishop(chessboard, True, 7, 1), -2)
+
+
+    def test_case_5(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,'P',0,0,0,0,0],
+                    [0,'B',0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.bad_bishop(chessboard, True, 7, 1), -1)
+
+
+
+    def test_case_6(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,'B',0,0,0,0,0,0]
+                ]
+        
+        self.assertEqual(validation.bad_bishop(chessboard, True, 7, 1), 0)
+
+
+
+
+class Queen_early_development_tests(unittest.TestCase):
+
+
+    #
+    # BLACK
+    #
+
+
+    def test_case_1(self):
+
+        chessboard = [
+                    [0,0,0,'q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, False, 14), 0)
+
+    def test_case_2(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, False, 14), 30)
+
+
+    
+    def test_case_3(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, False, 10), 15)
+
+
+    
+    def test_case_4(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, False, 8), 0)
+
+
+    #
+    # WHITE
+    #
+
+
+
+    def test_case_5(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'Q',0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, True, 14), 0)
+
+
+    def test_case_6(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'Q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, True, 14), -30)
+
+    
+    def test_case_7(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'Q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, True, 10), -15)
+
+
+
+
+    def test_case_7(self):
+
+        chessboard = [
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0],
+                    [0,0,0,'Q',0,0,0,0],
+                    [0,0,0,0,0,0,0,0]
+                ]
+        
+
+        self.assertEqual(validation.early_queen_development_penalty(chessboard, True, 8), 0)

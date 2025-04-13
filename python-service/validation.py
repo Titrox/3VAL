@@ -27,7 +27,7 @@ Pieces = constants.Pieces
 # Flask route to get the best move using the minimax algorithm
 # Returns a dictionary with 'from' and 'to' fields
 @app.route('/best-move', methods=['POST'])
-def get_best_move_api():
+def get_best_move_api():  # pragma: no cover
 
     # Define infinity values for minimax algorithm
     INFINITY = float('inf')
@@ -61,7 +61,7 @@ def get_best_move_api():
 
 
 @app.route('/evaluate-position', methods=['POST'])
-def evaluate_position_api():
+def evaluate_position_api():  # pragma: no cover
 
     data = request.get_json()
     logger.debug(data)
@@ -77,7 +77,7 @@ def evaluate_position_api():
 
 
 # Convert FEN string to a chessboard object
-def fen_to_chessboard_object(fen):
+def fen_to_chessboard_object(fen):  # pragma: no cover
     
     # Split FEN into board position and game information
     chessboard_fen, information_fen = fen.split(" ",1) 
@@ -393,16 +393,24 @@ def legal_en_passant_moves(possible_en_passant, chessboard, is_white):
                         en_passant_moves.setdefault((converted_row - 1, converted_column + field), []).append(converted_en_passant_move)    
 
         # If the en passant target row is the 3rd rank (for white's pawn capture)
-        elif converted_row == 3:
+        elif converted_row == 2:
+            logger.debug("TEST")
             # Check for white pawns that can make the en passant capture
             for field in [-1, +1]: # Check the squares to the left and right of the target square
                 # Check if the adjacent square contains a white pawn and is within the board boundaries
+                logger.debug(f" In bound: {in_bound(converted_row + 1, converted_column + field)}")
+                logger.debug(f"Check Pawn on: {converted_row + 1}, {converted_column + field}")
+                logger.debug(f"Pawn found? {chessboard[converted_row + 1][converted_column + field] == 'P'}")
+                
+
                 if in_bound(converted_row + 1, converted_column + field) and chessboard[converted_row + 1][converted_column + field] == 'P':
 
                     # Simulate the en passant move
                     sim_chessboard = copy.deepcopy(chessboard)
                     sim_chessboard[converted_row][converted_column] = 'P' # Place the capturing pawn on the target square
                     sim_chessboard[converted_row + 1][converted_column + field] = 0 
+
+                    logger.debug("SIm move")
 
 
                     sim_chessboard[converted_row + 1][converted_column] = 0 # remove captured black pawn
@@ -689,7 +697,7 @@ def is_enemy(is_white, figure):
 ###
 
     # Evaluates current chessboard position
-def evaluate_position(chessboard):
+def evaluate_position(chessboard):  # pragma: no cover
 
     value = 0
     value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions TODO integrate in for loop
@@ -762,7 +770,7 @@ def evaluate_position(chessboard):
                 # Bad Bishop - Bishop blocked by own pawns
 
                 if piece.lower() == 'b': # Bishop detected
-                    value -= 3 * bad_bishop(chessboard, piece.isupper(), i, j)
+                    value += 3 * bad_bishop(chessboard, piece.isupper(), i, j)
 
                     distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position) 
                     value += king_tropism(distance, piece)
@@ -943,17 +951,17 @@ def bad_bishop(chessboard, is_white, row, column):
 
 
 
-    return blocking_pawns if is_white else -blocking_pawns
+    return -blocking_pawns if is_white else blocking_pawns
     
 
 # Returns penalty for early queen development depending on number of pawns 
 def early_queen_development_penalty(chessboard, is_white, pawn_counter):
 
     if is_white:
-        queen_row = 0
+        queen_row = 7
         queen = 'Q'
     else:
-        queen_row = 7
+        queen_row = 0
         queen = 'q'
 
 
@@ -968,7 +976,7 @@ def early_queen_development_penalty(chessboard, is_white, pawn_counter):
         # Else no penalty
 
     else:
-        return -1
+        return 0
 
 # Class to represent the state of a chessboard
 class Chessboard_state:
@@ -981,5 +989,5 @@ class Chessboard_state:
 
 
 # Run the Flask app if this file is executed directly
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     app.run(host="0.0.0.0", port=5000, debug=True)

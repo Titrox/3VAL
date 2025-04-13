@@ -36,7 +36,7 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
         return Move_with_value(move_leading_here.start, move_leading_here.end,
                                  validation.evaluate_position(chessboard),
                                  chessboard_object.promotion)
-
+    
     if is_white:  # Maximizing player (White)
 
         best_move = Move_with_value(None, None, NEG_INFINITY, None)
