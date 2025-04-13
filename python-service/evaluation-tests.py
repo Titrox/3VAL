@@ -708,7 +708,7 @@ class Legal_move_tests(unittest.TestCase):
         ]
 
 
-        chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
+        chessboard_object = validation.Chessboard_state(chessboard, "-", "-", None)
 
         expected = {(1, 3): [(1, 2), (1, 4), (0, 3), (0, 2), (0, 4), (2, 2), (2, 4)]}
 
@@ -728,7 +728,7 @@ class Legal_move_tests(unittest.TestCase):
                 ['R', 'N', 'B', 0, 'K', 0, 'N', 'R']
             ]
 
-            chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
+            chessboard_object = validation.Chessboard_state(chessboard, "-", "-", None)
 
 
             expected = {
@@ -764,7 +764,7 @@ class Legal_move_tests(unittest.TestCase):
                 ['R', 'N', 'B', 0, 'K', 0, 'N', 'R']
             ]
 
-            chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
+            chessboard_object = validation.Chessboard_state(chessboard, "-", "-", None)
 
             expected = {
                 (0, 0): [(0, 1)], 
@@ -794,7 +794,7 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 'K', 0, 'R', 0, 'N', 'R']
         ]
 
-        chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
+        chessboard_object = validation.Chessboard_state(chessboard, "-", "-", None)
 
         excepted = {
             (0, 0): [(0, 1)], 
@@ -830,7 +830,7 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 0, 'R', 0, 0, 0, 'R']
         ]
 
-        chessboard_object = validation.Chessboard_state(chessboard, "-", "-")
+        chessboard_object = validation.Chessboard_state(chessboard, "-", "-", None)
 
         expected = {
             (0, 0): [(0, 1), (1, 0)], 
@@ -865,7 +865,7 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 0, 'R', 0, 0, 0, 'R']
         ]
 
-        chessboard_object = validation.Chessboard_state(chessboard, "kq", "-")
+        chessboard_object = validation.Chessboard_state(chessboard, "kq", "-", None)
 
         expected = {
             (0, 0): [(0, 1), (0, 2), (0, 3), (1, 0)], 
@@ -897,7 +897,7 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 0, 'R', 0, 0, 0, 'R']
         ]
 
-        chessboard_object = validation.Chessboard_state(chessboard, "q", "-")
+        chessboard_object = validation.Chessboard_state(chessboard, "q", "-", None)
 
         expected = {
             (0, 0): [(0, 1), (0, 2), (0, 3), (1, 0)], 
@@ -930,7 +930,7 @@ class Legal_move_tests(unittest.TestCase):
             [0, 0, 0, 'R', 0, 0, 0, 'R']
         ]
 
-        chessboard_object = validation.Chessboard_state(chessboard, "k", "-")
+        chessboard_object = validation.Chessboard_state(chessboard, "k", "-", None)
 
         expected = {
             (0, 0): [(0, 1), (0, 2), (0, 3), (1, 0)], 
@@ -1089,7 +1089,7 @@ class Virtual_mobility_tests(unittest.TestCase):
                 [0,0,0,0,0,0,0,0]
             ]
         
-        self.assertEqual(validation.virtual_mobility(chessboard, False, 0,6), -7)
+        self.assertEqual(validation.virtual_mobility(chessboard, False, 0,6), 7)
 
 
     def test_case_2(self):
@@ -1105,7 +1105,7 @@ class Virtual_mobility_tests(unittest.TestCase):
                 [0,0,0,0,0,0,0,0]
             ]
         
-        self.assertEqual(validation.virtual_mobility(chessboard, False, 0,6), -14)
+        self.assertEqual(validation.virtual_mobility(chessboard, False, 0,6), 14)
 
 
 
@@ -1122,7 +1122,7 @@ class Virtual_mobility_tests(unittest.TestCase):
                 [0,'K',0,0,0,0,0,0]
             ]
         
-        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,1), 7)
+        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,1), -7)
 
 
 
@@ -1139,7 +1139,7 @@ class Virtual_mobility_tests(unittest.TestCase):
                 [0,'K',0,0,0,0,0,0]
             ]
         
-        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,1), 8)
+        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,1), -8)
 
 
     
@@ -1156,6 +1156,6 @@ class Virtual_mobility_tests(unittest.TestCase):
                 ['K',0,0,0,0,0,0,0]
             ]
         
-        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,0), 14)
+        self.assertEqual(validation.virtual_mobility(chessboard, True, 7,0), -14)
         
     

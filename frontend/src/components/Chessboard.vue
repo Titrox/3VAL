@@ -42,9 +42,39 @@ let opening;
 // Keeps track of emotion changes
 let sameEmotionCount;
 
+// Text on the debug button
+let debugText = ref("DEBUG")
 
+// Store IntervalId for glitch effect of debug button
+let intervalId = ref(null)
 
+//
+// DEBUG BUTTON
+//
 
+function generateRandomString(length = 5) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:,.<>?'
+  let result = ''
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * chars.length)
+    result += chars[randomIndex]
+  }
+  return result
+}
+
+function startAction() {
+  if (intervalId.value == null) {
+    intervalId.value = setInterval(() => {
+      debugText.value = generateRandomString()
+    }, 70)
+  }
+}
+
+function stopAction() {
+  clearInterval(intervalId.value)
+  intervalId.value = null
+  debugText.value = "DEBUG"
+}
 
 
 
@@ -314,7 +344,6 @@ function handleCheckmate(isMated) {
 <template>
 
   <div class="main-container">
-    
 
 
 
@@ -346,7 +375,17 @@ function handleCheckmate(isMated) {
     <div class="button-container button-container--options">
       <button class="button button--reset" @click="resetBoard">Zurücksetzen <i class="bi bi-arrow-repeat"></i></button>
       <button class="button button--undo" @click="undoLastMove">Zug zurück <i class="bi bi-arrow-counterclockwise"></i></button>
-      <button class="button button-switch" @click="togglePlayerColor">Seite wechseln <i class="bi bi-arrow-left-right"></i></button>
+      <button class="button button--switch" @click="togglePlayerColor">Seite wechseln <i class="bi bi-arrow-left-right"></i></button>
+      <button
+          class="button button--debug"
+          @click="togglePlayerColor"
+          @mouseover="startAction"
+          @mouseleave="stopAction"
+      >
+
+        {{ debugText }}
+
+      </button>
     </div>
   </div>
 </template>
@@ -428,6 +467,14 @@ function handleCheckmate(isMated) {
   background-color: rgb(128, 128, 128);
 }
 
+
+.button--debug {
+  font-family: 'Jersey 25', Arial, sans-serif;
+  font-size: 110%;
+  letter-spacing: 4px;
+  background-color: rgba(79, 133, 194, 0.93);
+}
+
 .container--figure-text-container{
   height: 13vh;
 
@@ -467,5 +514,7 @@ img{
   width: 100%;
   height: auto;
 }
+
+
 
 </style>
