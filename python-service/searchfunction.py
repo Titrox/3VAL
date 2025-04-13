@@ -27,7 +27,7 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
 
     if game_over:
         if reason == 0:  # Checkmate
-            value = INFINITY if is_white else NEG_INFINITY
+            value = NEG_INFINITY if is_white else INFINITY
         else:  # Stalemate
             value = 0
         return Move_with_value(move_leading_here.start, move_leading_here.end, value, None)
