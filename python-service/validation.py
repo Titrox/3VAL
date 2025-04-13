@@ -675,6 +675,7 @@ def is_check(chessboard, is_white):
                 if move == king_field:  # King is attacked -> check
                     return True
                 
+                
     return False  # King is not attacked            
  
 
@@ -682,11 +683,12 @@ def is_check(chessboard, is_white):
 def game_over(chessboard_object, is_white):
 
     legal_moves = len(generate_legal_moves(chessboard_object, is_white)) 
+    chessboard = chessboard_object.chessboard
 
     if legal_moves != 0:  # If there are legal moves, game continues
         return False, None
     
-    elif is_check:  # No legal moves and king in check = checkmate
+    elif is_check(chessboard, is_white):  # No legal moves and king in check = checkmate
         return True, 0
     
     else:  # No legal moves and king not in check = stalemate

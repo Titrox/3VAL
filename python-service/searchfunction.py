@@ -20,16 +20,24 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
     counter += 1
     logger.debug(counter)
 
+    
     chessboard = chessboard_object.chessboard
+
+    logger.debug(chessboard)
 
     # BASE CASES
     game_over, reason = validation.game_over(chessboard_object, is_white)
 
+    logger.debug(game_over)
+    logger.debug(reason)
+
     if game_over:
+        
         if reason == 0:  # Checkmate
             value = NEG_INFINITY if is_white else INFINITY
         else:  # Stalemate
             value = 0
+
         return Move_with_value(move_leading_here.start, move_leading_here.end, value, None)
 
     if depth == 0:  # Max search depth reached

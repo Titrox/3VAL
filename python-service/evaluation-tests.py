@@ -867,6 +867,24 @@ class En_passant_move_tests(unittest.TestCase):
 
 
 
+class Check_tests(unittest.TestCase):
+
+    def test_case_1(self):
+
+        chessboard = [
+            ['K', 0, 0, 0, 0, 'k', 0, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 'p'],
+            [0, 'q', 0, 0, 0, 0, 0, 'P'],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 0], 
+            [0, 0, 0, 'r', 0, 'r', 0, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 0]
+            ]
+        
+
+        self.assertEqual(validation.is_check(chessboard, True), False)
+
 class Legal_move_tests(unittest.TestCase):
 
 
@@ -1685,3 +1703,6 @@ class Queen_early_development_tests(unittest.TestCase):
         
 
         self.assertEqual(validation.early_queen_development_penalty(chessboard, True, 8), 0)
+
+
+    

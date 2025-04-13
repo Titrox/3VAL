@@ -2,6 +2,7 @@
   "name": "ChessAI",
   "version": "1.0.0",
   "dependencies": {
+    "ChessAI": "file:",
     "vue3-chessboard": "^1.3.3"
   }
 }

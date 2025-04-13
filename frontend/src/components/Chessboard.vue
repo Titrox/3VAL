@@ -5,6 +5,7 @@ import {computed, ref} from "vue";
 import axios from 'axios';
 import robotText from 'frontend/src/assets/roboter-texts.json'
 import {globalState} from 'frontend/public/store/globalState.js'
+import { onMounted } from 'vue'
 
 
 let boardApi;
@@ -42,6 +43,13 @@ let opening;
 // Keeps track of emotion changes
 let sameEmotionCount;
 
+
+
+
+// Triggered when component is loaded
+onMounted(() => {
+  playSpeechSound()
+})
 
 
 // Function to receive a move from an external source (e.g., socket, server) and apply it to the chessboard.
