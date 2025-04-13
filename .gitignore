@@ -1,1 +1,36 @@
 /python-service/__pycache__
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Benutzerbezogene Konfigurationen
+*.iws
+*.ipr
+
+# Log- und temporäre Dateien
+out/
+*.log
+*.tmp
+*.swp
+
+# Mac-Systemdateien (falls du auf macOS arbeitest)
+.DS_Store
+
+# Windows-Thumbs-Dateien
+Thumbs.db
+
+# JetBrains Rider oder andere JetBrains IDEs
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Optional: Ignoriere Build-Ordner je nach Projektart
+build/
+dist/
+target/
+node_modules/
+venv/
+.env
