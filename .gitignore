@@ -1,4 +1,5 @@
 /python-service/__pycache__
+/python-service/.coverage
 
 # IntelliJ IDEA
 .idea/
