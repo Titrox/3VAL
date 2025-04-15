@@ -110,8 +110,8 @@ class Psqt:
     
 
 class Piece_moves: # Pawn is handled seperatly / Queen = Rook + Bishop
-    Knight = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]  # Springer
-    Bishop = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  # Läufer (diagonal)
-    Rook = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # Turm (gerade)
-    King = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # König (wie Dame, aber nur 1 Feld)
-    Queen = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)] # Queen 
+    KNIGHT = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]  # Springer
+    BISHOP = [(-1, -1), (-1, 1), (1, -1), (1, 1)]  # Läufer (diagonal)
+    ROOK = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # Turm (gerade)
+    KING = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # König (wie Dame, aber nur 1 Feld)
+    QUEEN = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)] # Queen 
