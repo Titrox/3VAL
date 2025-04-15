@@ -540,7 +540,7 @@ def pawn_moves(field_row, field_column, is_white, chessboard):
 # Generate all possible bishop moves
 def bishop_moves(field_row, field_column, is_white, chessboard):
 
-    move_pattern = constants.Piece_moves.Bishop  # Get bishop movement directions
+    move_pattern = constants.Piece_moves.BISHOP  # Get bishop movement directions
     possible_moves = []
 
     for direction in move_pattern:
@@ -568,7 +568,7 @@ def bishop_moves(field_row, field_column, is_white, chessboard):
 # Generate all possible knight moves
 def knight_moves(field_row, field_column, is_white, chessboard):
     
-    move_pattern = constants.Piece_moves.Knight  # Get knight movement directions
+    move_pattern = constants.Piece_moves.KNIGHT  # Get knight movement directions
     possible_moves = []
 
     for direction in move_pattern:
@@ -594,7 +594,7 @@ def knight_moves(field_row, field_column, is_white, chessboard):
 # Generate all possible rook moves
 def rook_moves(field_row, field_column, is_white, chessboard):
 
-    move_pattern = constants.Piece_moves.Rook  # Get rook movement directions
+    move_pattern = constants.Piece_moves.ROOK  # Get rook movement directions
     possible_moves = []
 
     for direction in move_pattern:
@@ -622,7 +622,7 @@ def rook_moves(field_row, field_column, is_white, chessboard):
 # Generate all possible queen moves
 def queen_moves(field_row, field_column, is_white, chessboard):
     
-    move_pattern = constants.Piece_moves.Queen  # Get queen movement directions (combination of rook and bishop)
+    move_pattern = constants.Piece_moves.QUEEN  # Get queen movement directions (combination of rook and bishop)
     possible_moves = []
 
     for direction in move_pattern:
@@ -650,7 +650,7 @@ def queen_moves(field_row, field_column, is_white, chessboard):
 # Generate all possible king moves
 def king_moves(field_row, field_column, is_white, chessboard):
     
-    move_pattern = constants.Piece_moves.King  # Get king movement directions
+    move_pattern = constants.Piece_moves.KING  # Get king movement directions
     possible_moves = []
 
     for direction in move_pattern:
