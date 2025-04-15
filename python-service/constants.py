@@ -115,3 +115,11 @@ class Piece_moves: # Pawn is handled seperatly / Queen = Rook + Bishop
     ROOK = [(0, -1), (0, 1), (-1, 0), (1, 0)]  # Turm (gerade)
     KING = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]  # König (wie Dame, aber nur 1 Feld)
     QUEEN = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)] # Queen 
+
+
+class Evaluation_factors:
+    DYNAMIC_CONTROLL = 3
+    KNIGHT_OUTPOST = 5
+    BAD_BISHOP = 3
+    KING_SAFETY_PAWN_SHIELD = 6
+    KING_SAFETY_VIRTUAL_MOBILITY = 1

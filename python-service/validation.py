@@ -781,7 +781,7 @@ def evaluate_position(chessboard):  # pragma: no cover
                 # Center fields - Dynamic Control
 
                 if 2 < i < 5 and 2 < j < 5: 
-                    value += 3 * dynamic_control(piece, chessboard, i, j)
+                    value += constants.Evaluation_factors.DYNAMIC_CONTROLL * dynamic_control(piece, chessboard, i, j)
 
 
                 # King Safety
@@ -796,7 +796,7 @@ def evaluate_position(chessboard):  # pragma: no cover
                 # Outpost - Knight defended by pawn
 
                 if piece.lower() == 'n': # Knight detected
-                    value += 5 * knight_outpost(chessboard, piece.isupper(), i, j)
+                    value += constants.Evaluation_factors.KNIGHT_OUTPOST * knight_outpost(chessboard, piece.isupper(), i, j)
 
                     distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position)  
                     value += king_tropism(distance, piece)
@@ -804,7 +804,7 @@ def evaluate_position(chessboard):  # pragma: no cover
                 # Bad Bishop - Bishop blocked by own pawns
 
                 if piece.lower() == 'b': # Bishop detected
-                    value += 3 * bad_bishop(chessboard, piece.isupper(), i, j)
+                    value += constants.Evaluation_factors.BAD_BISHOP * bad_bishop(chessboard, piece.isupper(), i, j)
 
                     distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position) 
                     value += king_tropism(distance, piece)
@@ -835,8 +835,8 @@ def king_safety(chessboard, is_white, row, column):
 
     king_safety_value = 0
     
-    king_safety_value += 6 * pawn_shield(chessboard, is_white, row, column)
-    king_safety_value +=  virtual_mobility(chessboard, is_white, row, column)
+    king_safety_value += constants.Evaluation_factors.KING_SAFETY_PAWN_SHIELD * pawn_shield(chessboard, is_white, row, column)
+    king_safety_value += constants.Evaluation_factors.KING_SAFETY_VIRTUAL_MOBILITY * virtual_mobility(chessboard, is_white, row, column)
 
     return king_safety_value
 
@@ -859,8 +859,6 @@ def virtual_mobility(chessboard, is_white, row, column):
     
 
     return -len(possible_queen_moves) if is_white else len(possible_queen_moves)
-
-
 
         
 def pawn_shield(chessboard, is_white, row, column):
