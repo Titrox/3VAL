@@ -1,7 +1,6 @@
 <script setup>
 import Chessboard from "frontend/src/components/Chessboard.vue";
-import Background from "frontend/src/components/Background.vue";
-import Music from "frontend/src/components/Music.vue";
+
 
 </script>
 
@@ -13,7 +12,11 @@ import Music from "frontend/src/components/Music.vue";
 
 <style scoped>
 
-/* CONTAINER */
+/*
+*
+* CONTAINER
+*
+*/
 
 .main-container {
   height: 100vh;

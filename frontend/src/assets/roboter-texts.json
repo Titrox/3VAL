@@ -121,7 +121,7 @@
     "Ich hoffe, du bist bereit – ich hab gut geschmiert!"
   ],
   "engine_win": [
-    "Yesss! Ich hab gewonnen! Das war richtig gutes Schach!",
+    "Yesss! Ich hab gewonnen! Tim wäre bestimmt stolz auf mich!",
     "Gewonnen! Ich bin ganz aus dem Häuschen!",
     "Ich wusste, ich kann’s noch! Gut gespielt!",
     "Wow, das war ein tolles Spiel! Danke für die Herausforderung!",
@@ -129,7 +129,7 @@
     "Ich war heute einfach in Topform!",
     "Was für ein Spiel! Ich freu mich riesig über den Sieg!",
     "Du hast super gespielt! Diesmal war ich ein kleines bisschen besser.",
-    "Hehe, Sieg für den Roboter!",
+    "Hehe, Sieg für den Roboter! Ich wünschte Tim hätte das gesehen!",
     "Gute Partie – ich hab mein Bestes gegeben und gewonnen!"
   ],
   "player_win": [
@@ -187,5 +187,27 @@
     "Weißt du, jeder Spieler hat seinen eigenen Stil!",
     "Wusstest du, dass ein Großmeister über 2500 Punkte braucht?",
     "Schachspieler sind echte Superhirne!"
+  ],
+  "mode_select": [
+    "Da bist du ja! Ich hab schon auf dich gewartet – bereit für eine Runde Schach?",
+    "Endlich bist du da! Jetzt fehlt nur noch der Spielmodus und wir legen los!",
+    "Willkommen zurück, Freund! Such dir einen Modus aus und los geht's!",
+    "Yay, du bist da! Ich freu mich riesig – lass uns spielen!",
+    "Schön, dich zu sehen! Bereit für ein spannendes Match?",
+    "Hallo, hallo! Wähl deinen Modus – ich bin schon in Schachlaune!",
+    "Wie schön, du bist wieder da! Ich bin sowas von bereit für unser Spiel!",
+    "Da ist ja mein Lieblingsspieler! Nur noch den Modus wählen und los geht's!",
+    "Hey du! Bereit für eine kleine Schachpartie mit mir?",
+    "Ich hab dich schon erwartet! Jetzt schnell einen Modus wählen und wir starten!",
+    "Endlich Zeit für unser Spiel! Lass uns loslegen – Modus aussuchen nicht vergessen!",
+    "Yesss! Du bist online! Jetzt nur noch ein Modus wählen, dann können wir loslegen!",
+    "Hallo Freund! Bereit, ein paar Figuren zu schubsen? Such dir einen Modus aus!",
+    "Oh wie schön, dich zu sehen! Ich hab das Schachbrett schon geputzt!",
+    "Hallo! Ich bin bereit – du musst nur noch sagen, wie du spielen willst!",
+    "Hach, ich freu mich! Lass uns direkt anfangen – such dir den Modus aus!",
+    "Na endlich wieder ein gutes Schachspiel! Ich hab schon trainiert!",
+    "Ich liebe es, wenn du hier bist! Such dir den Modus aus und los geht's!",
+    "Was für eine Freude! Du bist da! Ich bin sowas von startklar!",
+    "Da bist du ja! Ich dachte schon, ich muss alleine spielen!"
   ]
 }

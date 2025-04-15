@@ -176,7 +176,7 @@ def get_psqt_value(field, piece, is_white):
     if not is_white or kingOrQueen:
         return psqt[63 - field]  # Return mirrored value
     else:
-         return psqt[field]  # Return normal value
+        return psqt[field]  # Return normal value
         
 
 # Return the appropriate piece-square table for a given piece
@@ -754,6 +754,8 @@ def evaluate_position(chessboard):  # pragma: no cover
                 
                 if piece.lower() == 'p':
                     pawn_counter += 1
+
+                    # King Tropism
 
                     distance = distance_to_king(i, j, white_king_position) if piece.islower() else distance_to_king(i, j, black_king_position)  
                     value += king_tropism(distance, piece)

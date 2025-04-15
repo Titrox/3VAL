@@ -127,6 +127,10 @@ def get_move_value(start, end, chessboard_object):
 
 
 
+#
+# QUICKSORT
+#
+
 def quicksort(array, is_white, low=0, high=None):
  
     if high is None:
@@ -168,6 +172,9 @@ def partition(array, low, high, is_white):
 
 
 
+#
+# CLASSES
+#
 
 
     

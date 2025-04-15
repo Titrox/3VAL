@@ -358,7 +358,11 @@ function handleCheckmate(isMated) {
 @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Jersey+25&display=swap');
 
 
-/* CONTAINER */
+/*
+*
+* CONTAINER
+*
+*/
 
 .main-container {
   display: flex;
@@ -395,7 +399,11 @@ function handleCheckmate(isMated) {
   border-radius: 10px;
 }
 
-/* BUTTONS */
+/*
+*
+* BUTTONS
+*
+*/
 
 .button {
   border: none;
@@ -403,7 +411,8 @@ function handleCheckmate(isMated) {
   height: 5vh;
   width: 10vw;
 
-  font-family: 'Dynapuff', Arial, sans-serif;
+  font-family: 'Jersey 25', Arial, sans-serif;
+  font-size: 110%;
   font-weight: 200;
 
   box-shadow: black 4px 4px;
@@ -424,17 +433,13 @@ function handleCheckmate(isMated) {
   background-color: #f64040;
 }
 
-.button--dissabled {
-  background-color: rgb(128, 128, 128);
-}
 
+/*
+*
+* ROBOT
+*
+*/
 
-.button--debug {
-  font-family: 'Jersey 25', Arial, sans-serif;
-  font-size: 110%;
-  letter-spacing: 4px;
-  background-color: rgba(79, 133, 194, 0.93);
-}
 
 .container--figure-text-container{
   height: 13vh;
