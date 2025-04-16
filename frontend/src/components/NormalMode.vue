@@ -1,12 +1,14 @@
 <script setup>
 import Chessboard from "frontend/src/components/Chessboard.vue";
+import Robot from "./Robot.vue";
 
 
 </script>
 
 <template>
     <div class="main-container">
-      <Chessboard />
+      <Chessboard>
+      </Chessboard>
     </div>
 </template>
 

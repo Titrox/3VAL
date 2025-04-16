@@ -6,6 +6,11 @@ import axios from 'axios';
 import robotText from 'frontend/src/assets/roboter-texts.json'
 import {globalState} from 'frontend/public/store/globalState.js'
 import { onMounted } from 'vue'
+import Robot from "./Robot.vue";
+
+
+
+// GENERAL
 
 
 let boardApi;
@@ -22,58 +27,31 @@ let lastValue = ref(0);
 // Difference in evaluation value between the last and current position.
 let deltaValue;
 
-// Current emotion of the robot. Defaults to 'happy'.
-let emotion = 'happy';
-
-// Stores the robot's emotion from the last chessboard evaluation.
-let lastEmotion = '';
-
-// Message displayed by the robot. Initialized with a random start message.
-let message = ref(robotText["start"][Math.floor(Math.random() * robotText["start"].length)]);
-
-// Currently displayed robot image. Initialized with a happy image.
-let robotImage = ref('images/happy_1.png')
-
 // Counter for the current turn number.
 let turnNumber = 0
 
 // Opening played by player
 let opening;
 
-// Keeps track of emotion changes
-let sameEmotionCount;
+
+
+const robot = ref()
+
+
+// ROBOT FIELDS
 
 
 
 
 // Triggered when component is loaded
 onMounted(() => {
-  playSpeechSound()
+  robot.value?.playSpeechSound()
 })
 
 
 // Function to receive a move from an external source (e.g., socket, server) and apply it to the chessboard.
 function onReceiveMove(move) {
   boardApi?.move(move)
-}
-
-// Function to get the file path of a robot image based on the given emotion.
-function getRobotImage(emotion) {
-  const randomNumber = Math.floor(Math.random() * 2) + 1; // Generates either 1 or 2.
-  return `/images/${emotion}_${randomNumber}.png`;
-}
-
-// Function to determine the robot's emotion based on the change in evaluation value.
-function getRobotEmotion(deltaValue) {
-
-  if (playerColor.value === 'black') { // Invert the value if the engine is playing white.
-    deltaValue = -deltaValue;
-  }
-
-  if (deltaValue >= 150) return "happy";
-  if (deltaValue <= -70) return "embarrassed";
-  if (deltaValue <= -150) return "shocked";
-  return "thoughtful";
 }
 
 
@@ -100,7 +78,7 @@ async function playBestMove() {
       console.log("Delta value:" + deltaValue)
       lastValue.value = move_object.value
 
-      updateRobot(deltaValue);
+      robot.value?.updateRobot(deltaValue, turnNumber, playerColor.value);
     }
 
   } catch (e) {
@@ -129,59 +107,7 @@ async function evaluatePosition() {
 }
 
 
-// Updates the robot's emotion, message, and image based on the change in evaluation value.
-// TODO Refactor
-function updateRobot(deltaValue) {
 
-  // Get updated robot emotion
-  emotion = getRobotEmotion(deltaValue);
-
-  console.log(emotion)
-  console.log(lastEmotion)
-
-  if (turnNumber < 3) { // For the first few moves of the engine.
-
-    message.value = robotText["opening"][Math.floor(Math.random() * robotText["opening"].length)];
-    playSpeechSound()
-
-  } else if ((emotion !== lastEmotion || turnNumber % 3 === 0) && turnNumber >= 10) {  // Change message all 3 moves or if emotion changes
-
-    if (emotion === lastEmotion) { // Check if Emotion changed
-      sameEmotionCount++
-    } else {
-      sameEmotionCount = 0;
-    }
-
-
-    lastEmotion = emotion;
-    message.value = robotText[emotion][Math.floor(Math.random() * robotText[emotion].length)];
-    robotImage.value = getRobotImage(emotion)
-    playSpeechSound()
-
-  } else if (emotion === lastEmotion) { // Random fun-fact if robots emotion have not changed for 4 engine moves
-
-    sameEmotionCount++
-    console.log(`Same Emotion + ${sameEmotionCount}`)
-
-    if (sameEmotionCount > 4 && turnNumber >= 10) {
-      message.value = robotText["fun_facts"][Math.floor(Math.random() * robotText["fun_facts"].length)];
-      emotion = "happy"
-      robotImage.value = getRobotImage("happy")
-      sameEmotionCount = 0;
-      playSpeechSound()
-    }
-
-  } else if (turnNumber === 8 || turnNumber === 9) { // Comment on opening on 8. or 9. move (depending on player-color)
-
-    const rawMessage = robotText["opening_commentary"][Math.floor(Math.random() * robotText["opening_commentary"].length)];
-
-    message.value = rawMessage.replace("${opening}", opening)
-    emotion = "happy"
-    robotImage.value = getRobotImage("happy")
-    playSpeechSound()
-
-  }
-}
 
 // Resets the chessboard to its initial state and resets the robot's state.
 function resetBoard() {
@@ -192,9 +118,9 @@ function resetBoard() {
 
   boardApi.resetBoard();
   playerColor.value = 'white';
-  console.log("test")
-  resetRobot();
+  robot.value?.resetRobot();
 }
+
 
 // Undoes the last move made on the chessboard, if possible.
 function undoLastMove() {
@@ -223,6 +149,10 @@ async function handleMove(move) {
   // Store played opening on 6. move
   if (turnNumber === 6) {
     opening = await boardApi?.getOpeningName();
+    console.log(`OPENING STORED: ${opening}`)
+    console.log("STORE IN ROBOT COMPONENT")
+    robot.value.opening = await boardApi?.getOpeningName();
+    console.log(`VALUE STORED:${robot.value.opening}`)
   }
 
   if (move.captured !== undefined) { // Piece was captured
@@ -236,13 +166,29 @@ async function handleMove(move) {
 }
 
 
+// Handles the checkmate event. Updates the robot's emotion and message based on who is checkmated.
+function handleCheckmate(isMated) {
 
+  console.log(isMated)
+  console.log(playerColor.value)
+  console.log(isMated === playerColor.value)
 
-// Resets the robot's message and image to the initial state and plays a speech sound.
-function resetRobot() {
-  message.value = robotText["start"][Math.floor(Math.random() * robotText["start"].length)];
-  robotImage.value = 'images/happy_1.png';
-  playSpeechSound()
+  if (isMated !== playerColor.value){
+    console.log("Matt");
+    robot.value.emotion = 'embarrassed';
+    robot.value.message = robotText["player_win"][Math.floor(Math.random() * robotText["player_win"].length)];
+    robot.value.robotImage = 'images/shocked_1.png';
+  }
+
+  else {
+
+    robot.value.emotion = 'happy';
+    robot.value.message = robotText["engine_win"][Math.floor(Math.random() * robotText["engine_win"].length)];
+    robot.value.robotImage = 'images/happy_2.png';
+  }
+
+  robot.value?.playSpeechSound()
+
 }
 
 
@@ -273,43 +219,7 @@ function playCapturedSound() {
 }
 
 
-// Plays a random speech sound if sound is not muted.
-function playSpeechSound() {
 
-  if (!soundMuted.value) {
-    const randomNum = Math.floor(Math.random() * 6) + 1;
-    const speechSound = new Audio(`/sounds/speech-sounds/speech_${randomNum}.wav`)
-    speechSound.volume = 0.2;
-
-    speechSound.play();
-  }
-
-}
-
-// Handles the checkmate event. Updates the robot's emotion and message based on who is checkmated.
-function handleCheckmate(isMated) {
-
-  console.log(isMated)
-  console.log(playerColor.value)
-  console.log(isMated === playerColor.value)
-
-  if (isMated !== playerColor.value){
-    console.log("Matt");
-    emotion = 'embarrassed';
-    message.value = robotText["player_win"][Math.floor(Math.random() * robotText["player_win"].length)];
-    robotImage.value = 'images/shocked_1.png';
-  }
-
-  else {
-
-    emotion = 'happy';
-    message.value = robotText["engine_win"][Math.floor(Math.random() * robotText["engine_win"].length)];
-    robotImage.value = 'images/happy_2.png';
-  }
-
-  playSpeechSound()
-
-}
 
 
 </script>
@@ -318,9 +228,11 @@ function handleCheckmate(isMated) {
 
   <div class="main-container">
 
-    <div class="button-container container--figure-text-container">
-      <div class="container container--figure-container"><img :src="robotImage" alt="roboter-glücklich"> </div>
-      <div class="container container--text-container">{{ message }}</div>
+    <div class="container container--robot-container">
+      <Robot ref="robot"/>
+      <slot>
+
+      </slot>
     </div>
 
     <div class="chessboard-container">
@@ -399,6 +311,13 @@ function handleCheckmate(isMated) {
   border-radius: 10px;
 }
 
+
+.container--robot-container {
+  width: 20%;
+  height: auto;
+
+}
+
 /*
 *
 * BUTTONS
@@ -475,6 +394,8 @@ function handleCheckmate(isMated) {
 
   font-family: 'Jersey 25', Arial, sans-serif;
 }
+
+
 
 img{
   width: 100%;

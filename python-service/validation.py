@@ -48,7 +48,7 @@ def get_best_move_api():  # pragma: no cover
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 3
-    best_move = searchfunction.MINIMAX(chessboard_object, 3, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
+    best_move = searchfunction.MINIMAX(chessboard_object, 2, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
    
     # logger.debug(best_move.to_dict)
 
