@@ -8,6 +8,10 @@ import Robot from "./Robot.vue";
 <template>
   <div class="main-container">
     <Chessboard>
+      <h2 class="text text--debug-test">DEBUG MODE</h2>
+      <div class="container container--debug-container">
+        <h3>Bald verfügbar!</h3>
+      </div>
     </Chessboard>
   </div>
 </template>
@@ -27,5 +31,29 @@ import Robot from "./Robot.vue";
   flex-direction: row;
 }
 
+.text--debug-test {
+  text-align: center;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+
+.container--debug-container {
+  height: 30vh;
+  padding: 5vh 1vw;
+
+  background-color: beige;
+  border-radius: 10px;
+  box-shadow: rgba(0,0,0,10%) 4px 4px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 5vh;
+}
+
 
 </style>
+
+

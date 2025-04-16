@@ -108,7 +108,14 @@ function stopAction() {
       <h2>Wähle einen Modus</h2>
 
       <div class="button-container button-container--modeSelect">
-        <button class="menu-button menu-button--normalMode" @click="goToNormalMode">Normal</button>
+
+        <div class="container container--button-description">
+
+          <button class="menu-button menu-button--normalMode" @click="goToNormalMode">Normal</button>
+          <p>Spiele gegen die aktuelle Version von <b>3VAL</b></p>
+        </div>
+
+        <div class="container container--button-description">
         <button
             class="menu-button menu-button--debugMode"
             @mouseover="startAction"
@@ -118,6 +125,9 @@ function stopAction() {
           {{ debugText }}
         </button>
 
+          <p>Passe die Evaluierungsfunktion an, lade FEN oder lasse <b>3VAL</b> gegen Stockfish spielen!</p>
+
+        </div>
       </div>
 
     </div>
@@ -131,12 +141,21 @@ function stopAction() {
 @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Jersey+25&display=swap');
 
 
+p {
+  font-family: 'Jersey 25', Arial, sans-serif;
+  margin-top: 10px;
+  color: rgba(0,0,0,0.4);
+  text-align: center;
+  font-size: 90%;
+}
+
 h2{
   font-family: 'Jersey 25', Arial, sans-serif;
   letter-spacing: 1px;
   margin-top: 10vh;
   margin-bottom: 3vh;
 }
+
 
 
 
@@ -179,6 +198,18 @@ h2{
   align-items: center;
   flex-direction: column;
   gap: 5vh;
+}
+
+
+.container--button-description {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+
+  width: 100%;
+
 }
 
 
