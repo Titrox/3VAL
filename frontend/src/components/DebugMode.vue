@@ -10,7 +10,8 @@ import Robot from "./Robot.vue";
     <Chessboard>
       <h2 class="text text--debug-test">DEBUG MODE</h2>
       <div class="container container--debug-container">
-        <h3>Bald verfügbar!</h3>
+        <div class="container container--debug-tools-container"></div>
+        <div class="container container--safe-discard-button-container"></div>
       </div>
     </Chessboard>
   </div>

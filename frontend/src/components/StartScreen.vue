@@ -23,7 +23,12 @@ let intervalId = ref(null)
 
 
 // Message loaded
-let message = ref("test123")
+let message = ref("Hallo")
+
+
+const formattedMessage = computed(() =>
+    message.value.replaceAll("3VAL", "<b>3VAL</b>")
+)
 
 // Robot image
 const robotImage = "/images/happy_2.png"
@@ -102,7 +107,7 @@ function stopAction() {
 
       <div class="button-container container--figure-text-container">
         <div class="container container--figure-container"><img :src="robotImage" alt="roboter-glücklich"> </div>
-        <div class="container container--text-container">{{ message }}</div>
+        <div class="container container--text-container"> <p v-html="formattedMessage"></p></div>
       </div>
 
       <h2>Wähle einen Modus</h2>
@@ -112,7 +117,7 @@ function stopAction() {
         <div class="container container--button-description">
 
           <button class="menu-button menu-button--normalMode" @click="goToNormalMode">Normal</button>
-          <p>Spiele gegen die aktuelle Version von <b>3VAL</b></p>
+          <p class="description">Spiele gegen die aktuelle Version von <b>3VAL</b></p>
         </div>
 
         <div class="container container--button-description">
@@ -125,7 +130,7 @@ function stopAction() {
           {{ debugText }}
         </button>
 
-          <p>Passe die Evaluierungsfunktion an, lade FEN oder lasse <b>3VAL</b> gegen Stockfish spielen!</p>
+          <p class="description">Passe die Evaluierungsfunktion an, lade FEN oder lasse <b>3VAL</b> gegen Stockfish spielen!</p>
 
         </div>
       </div>
@@ -142,10 +147,13 @@ function stopAction() {
 
 
 p {
+  text-align: center;
+}
+
+.description {
   font-family: 'Jersey 25', Arial, sans-serif;
   margin-top: 10px;
   color: rgba(0,0,0,0.4);
-  text-align: center;
   font-size: 90%;
 }
 
