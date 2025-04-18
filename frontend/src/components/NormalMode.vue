@@ -1,6 +1,40 @@
 <script setup>
 import Chessboard from "frontend/src/components/Chessboard.vue";
-import Robot from "./Robot.vue";
+import {onMounted} from "vue";
+import axios from "axios";
+
+
+
+// Make sure standard evaluation factors are loaded
+onMounted(() => {
+  const resetFactorsToStandard = async () => {
+    await resetFactors()
+    console.log("Evaluation factors reset")
+
+  }
+  resetFactorsToStandard()
+})
+
+// Reset factors (Backend)
+async function resetFactors() {
+
+  try {
+    const response = await axios.post(
+        'http://localhost:8080/reset-evaluation-factors',
+        null,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+    )
+
+    console.log(response)
+
+  } catch (e) {
+    console.log(e.message)
+  }
+}
 
 
 </script>

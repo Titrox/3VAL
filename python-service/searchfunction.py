@@ -1,5 +1,6 @@
 import validation
 import logging
+import time
 
 # Define infinity values for minimax algorithm
 INFINITY = float('inf')
@@ -8,6 +9,7 @@ NEG_INFINITY = float('-inf')
 # Initialize a counter for debugging purposes
 counter = 0
 
+
 # Set up basic logging configuration
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s", force=True)
 logger = logging.getLogger()
@@ -15,7 +17,7 @@ logger = logging.getLogger()
 
 
 # Minimax algorithm implementation to find the best move
-def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
+def MINIMAX(chessboard_object, depth, max_depth, is_white, move_leading_here, alpha, beta):
     global counter
     counter += 1
     logger.debug(counter)
@@ -23,13 +25,9 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
     
     chessboard = chessboard_object.chessboard
 
-    logger.debug(chessboard)
-
     # BASE CASES
-    game_over, reason = validation.game_over(chessboard_object, is_white)
 
-    logger.debug(game_over)
-    logger.debug(reason)
+    game_over, reason = validation.game_over(chessboard_object, is_white)
 
     if game_over:
         
@@ -38,9 +36,13 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
         else:  # Stalemate
             value = 0
 
-        return Move_with_value(move_leading_here.start, move_leading_here.end, value, None)
 
-    if depth == 0:  # Max search depth reached
+        return Move_with_value(move_leading_here.start, move_leading_here.end, value, None)
+    
+
+    if depth == max_depth:  # Max search depth reached
+
+        best_moves_per_depth
         return Move_with_value(move_leading_here.start, move_leading_here.end,
                                  validation.evaluate_position(chessboard),
                                  chessboard_object.promotion)
@@ -49,7 +51,10 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
 
         best_move = Move_with_value(None, None, NEG_INFINITY, None)
         legal_moves = validation.generate_legal_moves(chessboard_object, is_white)
+
+        
         ordered_moves = order_moves(chessboard_object, legal_moves, is_white)
+        
 
 
         for move in ordered_moves:
@@ -58,7 +63,9 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
             current_promotion = new_chessboard_object.promotion
             action_taken = Move(move.start, move.end)
 
-            result = MINIMAX(new_chessboard_object, depth - 1, not is_white, action_taken, alpha, beta)
+            result = MINIMAX(new_chessboard_object, depth + 1, max_depth, not is_white, action_taken, alpha, beta)
+
+            best_moves_per_depth.setdefault(depth,[]).extend((move.start, move.end, result.value)) # Store move in dic for iterative deepening
 
             if result.value > best_move.value:
                 best_move = Move_with_value(move.start, move.end, result.value, current_promotion)
@@ -75,7 +82,9 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
         
         best_move = Move_with_value(None, None, INFINITY, None)
         legal_moves = validation.generate_legal_moves(chessboard_object, is_white)
+
         ordered_moves = order_moves(chessboard_object, legal_moves, is_white)
+        
 
 
         for move in ordered_moves:
@@ -84,7 +93,7 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
             current_promotion = new_chessboard_object.promotion
             action_taken = Move(move.start, move.end)
 
-            result = MINIMAX(new_chessboard_object, depth - 1, not is_white, action_taken, alpha, beta)
+            result = MINIMAX(new_chessboard_object, depth + 1, max_depth, not is_white, action_taken, alpha, beta)
 
             if result.value < best_move.value:
                 best_move = Move_with_value(move.start, move.end, result.value, current_promotion)
@@ -98,6 +107,38 @@ def MINIMAX(chessboard_object, depth, is_white, move_leading_here, alpha, beta):
         return best_move
 
 
+
+
+def iterative_deepening(chessboard_object, is_white, max_time=2.0):
+    start_time = time.time()
+    time_limit = start_time + max_time
+
+    best_move = None
+    max_depth = 0
+
+    while True:
+        current_time = time.time()
+        if current_time >= time_limit:
+            break
+
+    
+        logger.debug(f"NEW ITERATIVE DEEPENING ITERATION, MAX_DEPTH = {max_depth}")
+        # Optional: add a timeout checker inside search
+        move = MINIMAX(chessboard_object, 0, max_depth, is_white, Move(0,0), NEG_INFINITY, INFINITY)
+        logger.debug("MAX DEPTH - 1 BEST MOVES")
+        logger.debug(best_moves_per_depth.get(max_depth - 1))
+
+      
+        best_moves_per_depth.clear()
+
+            
+        if move:
+            best_move = move
+        max_depth += 1
+
+
+
+    return best_move
 
 
 def order_moves(chessboard_object, legal_moves, is_white):

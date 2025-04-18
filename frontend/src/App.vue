@@ -3,17 +3,6 @@ import Background from "frontend/src/components/Background.vue";
 import { useRouter } from 'vue-router'
 import Music from "./components/Music.vue";
 
-
-const router = useRouter()
-
-function goToNormalMode() {
-  router.push("/normal-mode");
-}
-
-function goToDebugMode() {
-  router.push("/debug-mode");
-}
-
 </script>
 
 <template>

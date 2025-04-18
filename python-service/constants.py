@@ -1,14 +1,5 @@
 from enum import IntEnum
 
-# Piece-values
-class Pieces(IntEnum):
-    Q = 900
-    R= 400
-    B = 300
-    N = 300
-    P = 100
-    K = 0
-
 
 class Psqt:
 
@@ -117,9 +108,44 @@ class Piece_moves: # Pawn is handled seperatly / Queen = Rook + Bishop
     QUEEN = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)] # Queen 
 
 
+
+# Factors currently used in evaluation function (can be changed by client)
 class Evaluation_factors:
-    DYNAMIC_CONTROLL = 3
+    DYNAMIC_CONTROL = 3
     KNIGHT_OUTPOST = 5
     BAD_BISHOP = 3
     KING_SAFETY_PAWN_SHIELD = 6
     KING_SAFETY_VIRTUAL_MOBILITY = 1
+    QUEEN_EARLY_DEVELOPMENT_PENALTY = 30
+
+
+
+# Best known factors 
+class Standard_evaluation_factors:
+    DYNAMIC_CONTROL = 3
+    KNIGHT_OUTPOST = 5
+    BAD_BISHOP = 3
+    KING_SAFETY_PAWN_SHIELD = 6
+    KING_SAFETY_VIRTUAL_MOBILITY = 1
+    QUEEN_EARLY_DEVELOPMENT_PENALTY = 30
+
+
+
+# Piece-values
+class Pieces:
+    Q = 900
+    R= 400
+    B = 300
+    N = 300
+    P = 100
+    K = 0
+
+
+# Piece-values
+class Standard_pieces:
+    Q = 900
+    R= 400
+    B = 300
+    N = 300
+    P = 100
+    K = 0

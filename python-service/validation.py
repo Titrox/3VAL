@@ -4,7 +4,7 @@ import logging
 import constants
 import searchfunction
 import copy
-import json
+from flask import jsonify
 
 
 # Setting up basic logging configuration
@@ -15,7 +15,7 @@ logger = logging.getLogger()
 app = Flask(__name__)
 
 Pieces = constants.Pieces
-
+standard_pieces = constants.Standard_pieces
 
 
 ###
@@ -38,19 +38,18 @@ def get_best_move_api():  # pragma: no cover
     is_white = data["is_white"]  # Boolean indicating if it's white's turn
 
     received_fen = data["fen"]  # Get the FEN string from the request
+
     formatted_fen = urllib.parse.unquote(received_fen)  # Decode URL-encoded FEN string to ASCII
 
 
     chessboard_object = fen_to_chessboard_object(formatted_fen)  # Convert FEN to chessboard object
-    
-    # logger.debug(chessboard_object.chessboard)
 
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 3
-    best_move = searchfunction.MINIMAX(chessboard_object, 2, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
+    best_move = searchfunction.iterative_deepening(chessboard_object, is_white)
+    searchfunction.best_moves_per_depth = {}
    
-    # logger.debug(best_move.to_dict)
 
     fen_to_chessboard_object(formatted_fen)
 
@@ -71,7 +70,91 @@ def evaluate_position_api():  # pragma: no cover
     
     
     return str(evaluate_position(chessboard))
+
+
+
+@app.route('/get-evaluation-factors', methods=['GET'])
+def get_evaluation_factors():  # pragma: no cover
+
+    evaluation_factors = {
     
+    # evaluation factors
+    "centerControlValue": constants.Standard_evaluation_factors.DYNAMIC_CONTROL,
+    "knightOutpostValue": constants.Standard_evaluation_factors.KNIGHT_OUTPOST,
+    "badBishopValue": constants.Standard_evaluation_factors.BAD_BISHOP,
+    "pawnShieldValue": constants.Standard_evaluation_factors.KING_SAFETY_PAWN_SHIELD,
+    "virtualMobilityValue": constants.Standard_evaluation_factors.KING_SAFETY_VIRTUAL_MOBILITY,
+    "queenEarlyDevValue": constants.Standard_evaluation_factors.QUEEN_EARLY_DEVELOPMENT_PENALTY,
+
+    # piece values
+    "queenValue": constants.Standard_pieces.Q,
+    "rookValue": constants.Standard_pieces.R,
+    "bishopValue": constants.Standard_pieces.B,
+    "knightValue": constants.Standard_pieces.N,
+    "pawnValue": constants.Standard_pieces.P
+}
+
+    resetEvaluationFactors() 
+    
+    return jsonify(evaluation_factors)
+    
+    
+
+@app.route('/put-evaluation-factors', methods=['PUT'])
+def put_evaluation_factors():  # pragma: no cover
+
+    data = request.get_json()
+
+
+    # Update factors  
+    constants.Evaluation_factors.DYNAMIC_CONTROL = float(data["centerControlValue"])
+    constants.Evaluation_factors.KNIGHT_OUTPOST = float(data["knightOutpostValue"])
+    constants.Evaluation_factors.BAD_BISHOP = float(data["badBishopValue"])
+    constants.Evaluation_factors.KING_SAFETY_PAWN_SHIELD = float(data["pawnShieldValue"])
+    constants.Evaluation_factors.KING_SAFETY_VIRTUAL_MOBILITY = float(data["virtualMobilityValue"]) 
+    constants.Evaluation_factors.QUEEN_EARLY_DEVELOPMENT_PENALTY = float(data["queenEarlyDevValue"])
+
+    # Update piece values
+    constants.Pieces.Q = float(data["queenValue"])
+    constants.Pieces.R = float(data["rookValue"])
+    constants.Pieces.B = float(data["bishopValue"])
+    constants.Pieces.N = float(data["knightValue"])
+    constants.Pieces.P = float(data["pawnValue"])
+
+
+    return jsonify({"status": "success", "message": "Evaluation factors updated successfully"}), 200
+
+
+
+@app.route('/reset-evaluation-factors', methods=['POST'])
+def rest_evaluation_factors():  # pragma: no cover
+
+    resetEvaluationFactors()
+
+    return jsonify({"status": "success", "message": "Evaluation factors reseted successfully"}), 200
+
+
+
+
+# Resets factors used by evaluation function to standard values
+def resetEvaluationFactors():
+
+    # Reset evaluation factors
+    constants.Evaluation_factors.DYNAMIC_CONTOL = constants.Standard_evaluation_factors.DYNAMIC_CONTROL
+    constants.Evaluation_factors.KNIGHT_OUTPOST = constants.Standard_evaluation_factors.KNIGHT_OUTPOST
+    constants.Evaluation_factors.BAD_BISHOP = constants.Standard_evaluation_factors.BAD_BISHOP
+    constants.Evaluation_factors.KING_SAFETY_PAWN_SHIELD = constants.Standard_evaluation_factors.KING_SAFETY_PAWN_SHIELD
+    constants.Evaluation_factors.KING_SAFETY_VIRTUAL_MOBILITY = constants.Standard_evaluation_factors.KING_SAFETY_VIRTUAL_MOBILITY
+    constants.Evaluation_factors.QUEEN_EARLY_DEVELOPMENT_PENALTY = constants.Standard_evaluation_factors.QUEEN_EARLY_DEVELOPMENT_PENALTY
+
+
+    # Reset piece values
+    constants.Pieces.Q = standard_pieces.Q
+    constants.Pieces.R = standard_pieces.R
+    constants.Pieces.B = standard_pieces.B
+    constants.Pieces.N = standard_pieces.N
+    constants.Pieces.P = standard_pieces.P
+
 
 ###
 #
@@ -148,20 +231,31 @@ def calc_piece_value_with_psqt(chessboard):
 
             char = chessboard[i][j]
 
+
             if char == 0:  # Empty square
                 currentField += 1
+                
+            else:
 
-            elif char.isupper():  # White piece
-                psqtValue = get_psqt_value(currentField, char, True)  # Get position value
-                value += getattr(Pieces, char, 0) + psqtValue  # Add piece value and position value
+                is_white = char.isupper()
+
+                psqtValue = get_psqt_value(currentField, char, is_white)  # Get position value
+                
+                match char.upper():
+                    case 'P': pieceValue = Pieces.P
+                    case 'R': pieceValue = Pieces.R
+                    case 'B': pieceValue = Pieces.B
+                    case 'N': pieceValue = Pieces.N
+                    case 'Q': pieceValue = Pieces.Q
+                    case _: pieceValue = 0  
 
                 currentField += 1 
+                
+                if is_white:
+                    value += psqtValue + pieceValue # Add piece value and position value 
+                else:
+                    value -= psqtValue + pieceValue # Add piece value and position value
 
-            elif char.islower():  # Black piece
-                psqtValue = get_psqt_value(currentField, char, False)  # Get position value
-                value -= getattr(Pieces, char.upper(), 0) + psqtValue  # Subtract piece value and position value
-            
-                currentField += 1
    
     return value
 
@@ -781,7 +875,7 @@ def evaluate_position(chessboard):  # pragma: no cover
                 # Center fields - Dynamic Control
 
                 if 2 < i < 5 and 2 < j < 5: 
-                    value += constants.Evaluation_factors.DYNAMIC_CONTROLL * dynamic_control(piece, chessboard, i, j)
+                    value += constants.Evaluation_factors.DYNAMIC_CONTROL * dynamic_control(piece, chessboard, i, j)
 
 
                 # King Safety
@@ -989,6 +1083,8 @@ def bad_bishop(chessboard, is_white, row, column):
 # Returns penalty for early queen development depending on number of pawns 
 def early_queen_development_penalty(chessboard, is_white, pawn_counter):
 
+    penalty = constants.Evaluation_factors.QUEEN_EARLY_DEVELOPMENT_PENALTY 
+
     if is_white:
         queen_row = 7
         queen = 'Q'
@@ -999,11 +1095,11 @@ def early_queen_development_penalty(chessboard, is_white, pawn_counter):
 
     if pawn_counter >= 14 and chessboard[queen_row][3] != queen: # Opening game - full penalty
         logger.debug("You")
-        return -30 if is_white else 30
+        return -penalty if is_white else penalty
         
         
     elif pawn_counter >= 10 and chessboard[queen_row][3] != queen: # Half pentalty
-        return -15 if is_white else 15
+        return -(penalty / 2) if is_white else (penalty / 2)
 
         # Else no penalty
 

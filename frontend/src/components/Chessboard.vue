@@ -353,49 +353,6 @@ function playCapturedSound() {
 }
 
 
-/*
-*
-* ROBOT
-*
-*/
-
-
-.container--figure-text-container{
-  height: 13vh;
-
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  flex-direction: row;
-  gap: 2vw;
-}
-
-
-.container--figure-container{
-  border-radius: 10%;
-  flex: 1;
-
-  display: flex;
-  justify-content: center;
-  align-items: end;
-}
-
-.container--text-container{
-  flex: 2;
-  background-color: white;
-  border-radius: 10%;
-  height: 50%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  padding: 1vw;
-
-  font-family: 'Jersey 25', Arial, sans-serif;
-}
-
-
 
 img{
   width: 100%;
