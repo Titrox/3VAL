@@ -1,6 +1,5 @@
 import validation
 import logging
-import time
 
 # Define infinity values for minimax algorithm
 INFINITY = float('inf')

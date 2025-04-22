@@ -27,7 +27,7 @@ let message = ref("Hallo")
 
 
 const formattedMessage = computed(() =>
-    message.value.replaceAll("3VAL", "<b>3VAL</b>")
+    message.value.replaceAll("3VAL", "<b>3VAL</b>") // Make 3VAL bold
 )
 
 // Robot image

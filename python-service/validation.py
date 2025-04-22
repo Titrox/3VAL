@@ -823,7 +823,7 @@ def is_enemy(is_white, figure):
 #
 ###
 
-    # Evaluates current chessboard position
+# Evaluates current chessboard position
 def evaluate_position(chessboard):  # pragma: no cover
 
     value = 0
@@ -993,7 +993,7 @@ def king_tropism(distance, piece):
         'p': 20    # Pawn: Geringer Einfluss, kann in direkter Nähe gefährlich werden
     }
 
-    value = round(factors.get(piece_type) / distance)
+    value = factors.get(piece_type) / distance
     return value if is_white else -value
 
 
