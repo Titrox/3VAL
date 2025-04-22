@@ -47,8 +47,8 @@ def get_best_move_api():  # pragma: no cover
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 3
-    best_move = searchfunction.iterative_deepening(chessboard_object, is_white)
-    searchfunction.best_moves_per_depth = {}
+    best_move = searchfunction.MINIMAX(chessboard_object, 0, 3, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
+    logger.debug(f"{best_move.start, best_move.end}")
    
 
     fen_to_chessboard_object(formatted_fen)
@@ -788,6 +788,7 @@ def game_over(chessboard_object, is_white):
     else:  # No legal moves and king not in check = stalemate
         return True, 1
     
+
 
 # Find the position of the king for a given color
 def get_king_field(chessboard, is_white):

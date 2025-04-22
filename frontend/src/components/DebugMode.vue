@@ -1,13 +1,25 @@
 <script setup>
 import Chessboard from "frontend/src/components/Chessboard.vue";
-import {onMounted, onUnmounted, ref, watch} from "vue";
+import {onMounted, ref, watch} from "vue";
 import axios from "axios";
 
 
 
 let valueChanged = ref(false)
-let ignoreWatch = false;
+let ignoreWatch = false
 
+let fen = ""
+let fenInputClass = ref("input input--valid")
+
+
+// Access chessboard component
+const chessboard = ref()
+
+
+
+//
+// EVALUATION VALUES
+//
 
 // KING SAFETY
 let pawnShieldValue = ref(0)
@@ -57,7 +69,7 @@ let standardPawnValue = 0
 
 
 
-
+// Init factors
 onMounted(() => {
   const getFactorsInit = async () => {
     await getEvaluationFactors()
@@ -67,6 +79,7 @@ onMounted(() => {
   getFactorsInit()
 })
 
+// Check for value changes
 watch(
     [
       pawnShieldValue,
@@ -95,6 +108,7 @@ watch(
 //
 // FACTORS API REQUESTS
 //
+
 
 // Fetch the evaluation factors from backend
 async function getEvaluationFactors() {
@@ -144,7 +158,7 @@ async function putFactors() {
   }
 }
 
-// Reset evaluation factors in backend to previously standard values (Backend)
+// Reset evaluation factors in backend to standard values (Backend)
 async function resetFactors() {
   try {
     const response = await axios.post(
@@ -214,6 +228,18 @@ function initFactors(factors) {
 
 
 
+function loadFen() {
+
+  try {
+    fenInputClass.value = "input input--valid"
+    chessboard.value.boardApi.setPosition(fen)
+  } catch (e) {
+    fenInputClass.value = "input input--invalid"
+  }
+}
+
+
+
 //
 // REACTIVE CSS CLASSES
 //
@@ -226,11 +252,12 @@ function getSaveButtonClass() {
 
 
 
+
 </script>
 
 <template>
   <div class="main-container">
-    <Chessboard>
+    <Chessboard ref="chessboard">
       <h2 class="text text--debug-text">DEBUG MODE</h2>
       <div class="container container--debug-container">
 
@@ -243,19 +270,19 @@ function getSaveButtonClass() {
           </div>
 
 
-            <div class="debug-container debug-container--king-safety">
+          <div class="debug-container debug-container--king-safety">
 
-              <h3>King Safety</h3>
+            <h3>King Safety</h3>
 
-              <div class="debug-container debug-container--pawn-shield">
-                <p>Pawn Shield: <b>{{pawnShieldValue}}</b></p>
-                <input type="range" v-model="pawnShieldValue" min="0" max="30" step="0.1" />
-              </div>
+            <div class="debug-container debug-container--pawn-shield">
+              <p>Pawn Shield: <b>{{pawnShieldValue}}</b></p>
+              <input type="range" v-model="pawnShieldValue" min="0" max="30" step="0.1" />
+            </div>
 
-              <div class="debug-container debug-container--virtual-mobility">
-                <p>Virtual Mobility: <b>{{virtualMobilityValue}}</b></p>
-                <input type="range" v-model="virtualMobilityValue" min="0" max="30" step="0.1" />
-              </div>
+            <div class="debug-container debug-container--virtual-mobility">
+              <p>Virtual Mobility: <b>{{virtualMobilityValue}}</b></p>
+              <input type="range" v-model="virtualMobilityValue" min="0" max="30" step="0.1" />
+            </div>
 
 
           <div class="debug-container debug-container--dynamic-control">
@@ -287,7 +314,7 @@ function getSaveButtonClass() {
               <p>Early Queen Development Penalty: <b>{{queenEarlyDevValue}}</b></p>
               <input type="range" v-model="queenEarlyDevValue" min="0" max="100" step="1" />
             </div>
-
+          </div>
 
             <div class="debug-container debug-container--evaluation-of-pieces">
               <h3>Piece Values</h3>
@@ -296,6 +323,7 @@ function getSaveButtonClass() {
                 <p>Queen Value: <b>{{queenValue}}</b></p>
                 <input type="range" v-model="queenValue" min="0" max="1000" step="10" />
               </div>
+
 
               <div class="debug-container debug-container--rook-value">
                 <p>Rook Value: <b>{{rookValue}}</b></p>
@@ -322,7 +350,19 @@ function getSaveButtonClass() {
 
             </div>
 
-          </div>
+
+            <div class="debug-container debug-container--fen-container">
+              <h3>FEN laden</h3>
+
+              <div class="debug-container debug-container--fen">
+                <div class="container container--fen-input-container">
+                  <input :class="fenInputClass" placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" v-model="fen">
+                  <button class="button button--load-fen" @click="loadFen">Laden</button>
+                </div>
+              </div>
+
+            </div>
+
         </div>
 
 
@@ -438,6 +478,10 @@ h3 {
   gap: 1vh;
 }
 
+.container--fen-input-container {
+  gap: 1vw;
+}
+
 
 /* Hide scrollbar */
 
@@ -449,8 +493,6 @@ h3 {
 .container::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
-
-
 
 
 /*
@@ -521,7 +563,30 @@ h3 {
 }
 
 
+.button--load-fen {
+  width: 5vw;
+  background-color: #9dfb8f;
+}
 
+
+/*
+*
+* INPUTS
+*
+ */
+
+input {
+  border-radius: 5px;
+  border: none;
+
+  padding: 5px;
+  font-family: 'Jersey 25', Arial, sans-serif;
+}
+
+
+.input--invalid {
+  border: 2px solid #f64040;
+}
 
 </style>
 

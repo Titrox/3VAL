@@ -32,6 +32,9 @@ let robotImage = ref('images/happy_1.png')
 // Opening played by player
 let opening = ref("test123");
 
+// True if Engine is currently
+let evaluating = ref(false)
+
 
 
 
@@ -40,6 +43,7 @@ defineExpose({
   updateRobot,
   resetRobot,
   playSpeechSound,
+  evaluating,
   emotion,
   robotImage,
   opening,
@@ -51,6 +55,7 @@ defineExpose({
 //
 // ROBOT
 //
+
 
 
 function getRobotImage(emotion) {
@@ -157,8 +162,16 @@ function playSpeechSound() {
 
     <div class="button-container container--figure-text-container">
 
-      <div class="container container--figure-container"><img :src="robotImage" alt="roboter-glücklich"> </div>
+      <div class="container container--figure-container"><img :src="robotImage" alt="roboter-glücklich">
+
+        <div class="container container--loading-container" v-if="evaluating">
+          <div class="loader"></div>
+
+        </div>
+
+      </div>
       <div class="container container--text-container">{{ message }}</div>
+
     </div>
 
   </div>
@@ -223,6 +236,7 @@ function playSpeechSound() {
 .container--figure-container{
   border-radius: 10%;
   flex: 1;
+  position: relative;
 
   display: flex;
   justify-content: center;
@@ -245,10 +259,38 @@ function playSpeechSound() {
 }
 
 
+.container--loading-container{
+  position: absolute;
+  top: -3vh;
+  color: rgba(0,0,0,0.4);
+  font-size: 70%;
+}
 
 img{
   width: 100%;
   height: auto;
+}
+
+
+/**
+*
+* Loader
+*
+ */
+
+
+
+.loader {
+  width: 8px;
+  aspect-ratio: 1;
+  border-radius: 20%;
+  animation: l5 1s infinite linear alternate;
+}
+@keyframes l5 {
+  0%  {box-shadow: 10px 0 #000, -10px 0 #0002;background: #000 }
+  33% {box-shadow: 10px 0 #000, -10px 0 #0002;background: #0002}
+  66% {box-shadow: 10px 0 #0002,-10px 0 #000; background: #0002}
+  100%{box-shadow: 10px 0 #0002,-10px 0 #000; background: #000 }
 }
 
 

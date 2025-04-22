@@ -885,6 +885,22 @@ class Check_tests(unittest.TestCase):
 
         self.assertEqual(validation.is_check(chessboard, True), False)
 
+
+    def test_case_2(self):
+
+        chessboard = [
+            [0, 0, 0, 0, 0, 0, 0, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0], 
+            [0, 0, 0, 'k', 0, 0, 0, 0], 
+            [0, 0, 0, 0, 0, 0, 0, 0], 
+            ["q", 0, 0, "K", 0, 0, 0, 0]
+            ]
+        
+        self.assertEqual(validation.is_check(chessboard, True), True)
+
 class Legal_move_tests(unittest.TestCase):
 
 

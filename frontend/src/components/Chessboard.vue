@@ -10,10 +10,12 @@ import Robot from "./Robot.vue";
 
 
 
+
+
 // GENERAL
 
 
-let boardApi;
+let boardApi = ref();
 
 // Reactive computed property to check if sound is muted from the global state.
 const soundMuted = computed(() => globalState.soundMuted);
@@ -37,6 +39,10 @@ let opening;
 
 const robot = ref()
 
+defineExpose({
+  boardApi,
+})
+
 
 // ROBOT FIELDS
 
@@ -51,7 +57,7 @@ onMounted(() => {
 
 // Function to receive a move from an external source (e.g., socket, server) and apply it to the chessboard.
 function onReceiveMove(move) {
-  boardApi?.move(move)
+  boardApi?.value.move(move)
 }
 
 
@@ -59,27 +65,33 @@ function onReceiveMove(move) {
 async function playBestMove() {
 
   const request = {
-    fen: boardApi?.getFen(),
-    is_white: boardApi?.getTurnColor() === "white"
+    fen: boardApi?.value.getFen(),
+    is_white: boardApi?.value.getTurnColor() === "white"
   }
 
   try {
+
+
+    robot.value.evaluating = true // Engine starts evaluating
+
     let response = await axios.post('http://localhost:8080/best-move', request)
     const move_object = response.data
 
-    console.log(response.data)
+    console.log(move_object)
+    onReceiveMove(move_object.move); // Play received move
 
-    onReceiveMove(move_object.move);
-
-    if (move_object.value !== "-inf" && move_object.value !== "inf") {
-
+    if (move_object.value >=! -5000 && move_object.value <=! 5000) { // Handle checkmate position
 
       deltaValue = lastValue.value - move_object.value;
       console.log("Delta value:" + deltaValue)
       lastValue.value = move_object.value
 
       robot.value?.updateRobot(deltaValue, turnNumber, playerColor.value);
+
+
     }
+
+    robot.value.evaluating = false // Engine stops evaluating
 
   } catch (e) {
     console.error(e.message);
@@ -89,7 +101,7 @@ async function playBestMove() {
 
 async function evaluatePosition() {
 
-  const fen = boardApi?.getFen().split(" ")[0]
+  const fen = boardApi?.value.getFen().split(" ")[0]
 
   const request = {
     fen: fen
@@ -116,7 +128,7 @@ function resetBoard() {
   lastValue.value = 0;
   turnNumber = 0;
 
-  boardApi.resetBoard();
+  boardApi.value.resetBoard();
   playerColor.value = 'white';
   robot.value?.resetRobot();
 }
@@ -124,7 +136,7 @@ function resetBoard() {
 
 // Undoes the last move made on the chessboard, if possible.
 function undoLastMove() {
-  boardApi.undoLastMove();
+  boardApi.value.undoLastMove();
 }
 
 
@@ -148,10 +160,10 @@ async function handleMove(move) {
 
   // Store played opening on 6. move
   if (turnNumber === 6) {
-    opening = await boardApi?.getOpeningName();
+    opening = await boardApi?.value.getOpeningName();
     console.log(`OPENING STORED: ${opening}`)
     console.log("STORE IN ROBOT COMPONENT")
-    robot.value.opening = await boardApi?.getOpeningName();
+    robot.value.opening = await boardApi?.value.getOpeningName();
     console.log(`VALUE STORED:${robot.value.opening}`)
   }
 
@@ -159,7 +171,7 @@ async function handleMove(move) {
     playCapturedSound()
   }
 
-  if (boardApi?.getTurnColor() !== playerColor.value) {
+  if (boardApi?.value.getTurnColor() !== playerColor.value) {
     console.log("Player move:" + await evaluatePosition()) // Calc evaluation value after player move
     await playBestMove();
   }
