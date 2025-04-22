@@ -11,6 +11,7 @@
 ├── api/                 # Spring Boot backend (REST API)
 ├── frontend/            # Vue.js frontend (Vite)
 ├── python-service/      # Python-based chess engine (Flask)
+├── docs/                # Theory and implementation details
 ├── docker-compose.yml   # Launches the Flask engine container
 ├── README.md            # Project overview
 ```
