@@ -1,4 +1,4 @@
-# 3VAL - Chess AI Project
+# 3VAL - Chess Engine
 
 **3VAL** is a modular chess engine system with an interactive robot interface. The project consists of a modern frontend, a Spring Boot backend, and a Python-based chess engine running in a Docker container. Users can play against the AI and observe real-time evaluations and emotional reactions from a robot assistant.
 
