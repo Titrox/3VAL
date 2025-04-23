@@ -29,7 +29,7 @@ jobs:
           mvn clean verify
 
       #############################################################
-      # 2️⃣ Vue Frontend Build (Node.js + Vite in frontend/)
+      # Vue Frontend Build (Node.js + Vite in frontend/)
       #############################################################
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -62,4 +62,4 @@ jobs:
       - name: Run evaluation tests
         run: |
           cd python-service
-          python evaluation-tests.py
+          python -m unittest evaluation-tests.py
