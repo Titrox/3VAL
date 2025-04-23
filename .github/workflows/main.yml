@@ -62,4 +62,4 @@ jobs:
       - name: Run evaluation tests
         run: |
           cd python-service
-          python -m unittest evaluations-tests.py
+          python -m unittest evaluation-tests.py
