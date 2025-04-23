@@ -74,8 +74,8 @@ The application will be available at [http://localhost:5173](http://localhost:51
 
 - [`frontend/README.md`](frontend/README.md) – UI setup and features
 - [`api/README.md`](api/README.md) – Backend endpoints and setup
-- `implementation.pdf` – Details technical implementation and architecture
-- `theory.pdf` – Describes algorithms like Minimax and evaluation strategies
+- [`implementation.pdf`](docs/implementation.pdf) – Details technical implementation and architecture
+- [`theory.pdf`](docs/theory.pdf) – Describes algorithms like Minimax and evaluation strategies
 
 ---
 
