@@ -80,7 +80,7 @@ async function playBestMove() {
     console.log(move_object)
     onReceiveMove(move_object.move); // Play received move
 
-    if (move_object.value >=! -5000 && move_object.value <=! 5000) { // Handle checkmate position
+    if (move_object.value >= -5000 && move_object.value <= 5000) { // Handle checkmate position
 
       deltaValue = lastValue.value - move_object.value;
       console.log("Delta value:" + deltaValue)

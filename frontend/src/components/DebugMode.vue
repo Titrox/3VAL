@@ -266,7 +266,7 @@ function getSaveButtonClass() {
           <div class="text text--information-text">
             Für genaue Werte nutze die Pfeiltasten <b><i class="bi bi-arrow-left-short"></i> und <i class="bi bi-arrow-right-short"></i></b> nach dem Auswählen eines Sliders.
             <br>
-            Die Erklärungen der verschiedenen Konzepte können der <b>theory.md</b> entnommen werden.
+            Die Erklärungen der verschiedenen Konzepte können der <b>theory.pdf</b> entnommen werden.
           </div>
 
 
