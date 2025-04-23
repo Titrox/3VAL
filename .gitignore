@@ -1,6 +1,7 @@
 /python-service/__pycache__
 /python-service/.coverage
 /python-service/htmlcov
+node_modules/
 
 
 # IntelliJ IDEA
