@@ -941,10 +941,11 @@ def is_enemy(is_white, figure):
 def evaluate_position(chessboard):  # pragma: no cover
 
     value = 0
-    value += calc_piece_value_with_psqt(chessboard)  # Calculate value based on pieces and their positions TODO integrate in for loop
 
     black_king_position = get_king_field(chessboard, False)
     white_king_position = get_king_field(chessboard, True)
+
+    current_field = 0 # Counter to get PSQT-Value
 
 
     pawn_counter = 0 # Keep track of pawns on field for estimation of game progress
@@ -955,6 +956,40 @@ def evaluate_position(chessboard):  # pragma: no cover
         for j in range (8):
 
             piece = chessboard[i][j]
+
+            #
+            # PSQT VALUE
+            #
+
+            if piece == 0:  # Empty square
+                current_field += 1
+                
+            else:
+
+                is_white = piece.isupper()
+                psqtValue = get_psqt_value(current_field, piece, is_white)  # Get position value
+                
+                match piece.upper():
+                    case 'P': pieceValue = Pieces.P
+                    case 'R': pieceValue = Pieces.R
+                    case 'B': pieceValue = Pieces.B
+                    case 'N': pieceValue = Pieces.N
+                    case 'Q': pieceValue = Pieces.Q
+                    case _: pieceValue = 0  
+
+                current_field += 1 
+                
+                if is_white:
+                    value += psqtValue + pieceValue # Add piece value and position value 
+                else:
+                    value -= psqtValue + pieceValue # Add piece value and position value
+
+
+
+            #
+            # EXTENDED EVALUATION FUNCTION
+            #
+
 
             if piece != 0: # Only evaluate relevant fields (no empty fields)
 
