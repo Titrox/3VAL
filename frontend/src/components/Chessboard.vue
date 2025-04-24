@@ -64,15 +64,14 @@ function onReceiveMove(move) {
 // Asynchronously fetches the best move from the backend based on the current board state.
 async function playBestMove() {
 
+  robot.value.evaluating = true // Engine starts evaluating
+
   const request = {
     fen: boardApi?.value.getFen(),
     is_white: boardApi?.value.getTurnColor() === "white"
   }
 
   try {
-
-
-    robot.value.evaluating = true // Engine starts evaluating
 
     let response = await axios.post('http://localhost:8080/best-move', request)
     const move_object = response.data
@@ -88,13 +87,15 @@ async function playBestMove() {
 
       robot.value?.updateRobot(deltaValue, turnNumber, playerColor.value);
 
-
     }
 
-    robot.value.evaluating = false // Engine stops evaluating
-
   } catch (e) {
-    console.error(e.message);
+
+    robot.value.message = "Ups, etwas scheint mit meiner Verbindung nicht zu stimmen."
+    robot.value.playSpeechSound()
+
+  } finally {
+    robot.value.evaluating = false // Engine stops evaluating
   }
 }
 
