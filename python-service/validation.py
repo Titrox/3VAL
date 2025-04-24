@@ -5,6 +5,7 @@ import constants
 import searchfunction
 import copy
 from flask import jsonify
+import time
 
 
 # Setting up basic logging configuration
@@ -23,6 +24,7 @@ standard_pieces = constants.Standard_pieces
 # API
 #
 ###
+
 
 # Flask route to get the best move using the minimax algorithm
 # Returns a dictionary with 'from' and 'to' fields
@@ -47,8 +49,12 @@ def get_best_move_api():  # pragma: no cover
     searchfunction.counter = 0  # Reset search counter
 
     # Search for the best move with depth 3
+    
+    start_time = time.time()  # Startzeit
     best_move = searchfunction.MINIMAX(chessboard_object, 0, 3, is_white, searchfunction.Move(0,0), NEG_INFINITY, INFINITY)
+    end_time = time.time()
     logger.debug(f"{best_move.start, best_move.end}")
+    logger.debug(f"Evaluierung hat {end_time - start_time} gedauert")
    
 
     fen_to_chessboard_object(formatted_fen)
@@ -755,23 +761,131 @@ def king_moves(field_row, field_column, is_white, chessboard):
 # Check if the king of the given color is in check
 def is_check(chessboard, is_white):
 
-    # Get all possible moves by the opponent
-    all_opponent_moves = generate_moves(chessboard, not is_white)
-    king_field = get_king_field(chessboard, is_white)  # Find the king's position
 
-    # Check if any opponent move can capture the king
-    for key, value in all_opponent_moves.items():
-        
-        if (len(value) != 0): 
-           
-            for move in value: 
+    king_field = get_king_field(chessboard, is_white)  # Find the king's position (Tupel)
 
-                if move == king_field:  # King is attacked -> check
+
+
+    #
+    # Diagonal lines (Check for queen or bishop)
+    #
+
+    move_pattern = constants.Piece_moves.BISHOP  # Get bishop moves (Check diagionals)
+
+
+    for direction in move_pattern:
+        row, column = king_field[0], king_field[1]  # Starting position
+
+        # Continue moving in the direction until blocked
+        while in_bound(row + direction[0], column + direction[1]): 
+
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
+
+            if chessboard[row][column] != 0:  # Found piece
+                
+                if is_enemy(is_white, chessboard[row][column]) and (chessboard[row][column].upper() == "B" or chessboard[row][column].upper() == "Q"): # Enemy bishop or queen found -> Checkmate
                     return True
                 
+                else: # No enemy bishop or queen found
+                    break
+
+
+    #
+    # Vertical and horizontal lines (Check for queen or rook)
+    #
+
+
+    move_pattern = constants.Piece_moves.ROOK  # Get rook moves (Check diagionals)
+
+    for direction in move_pattern:
+        row, column = king_field[0], king_field[1]  # Starting position
+
+        # Continue moving in the direction until blocked
+        while in_bound(row + direction[0], column + direction[1]): 
+
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
+
+            if chessboard[row][column] != 0:  # Found piece
                 
-    return False  # King is not attacked            
- 
+                if is_enemy(is_white, chessboard[row][column]) and (chessboard[row][column].upper() == "R" or chessboard[row][column].upper() == "Q"): # Enemy rook or queen found -> Checkmate
+                    return True
+                
+                else: # No enemy rook or queen found
+                    break
+
+
+    
+
+    #
+    # Knight moves
+    #
+
+
+    move_pattern = constants.Piece_moves.KNIGHT  # Get knight movement directions
+
+    for direction in move_pattern:
+        row, column = king_field[0], king_field[1]  # Starting position
+
+        # Continue moving in the direction until blocked
+        if in_bound(row + direction[0], column + direction[1]):
+
+            row += direction[0]  # Vertical movement
+            column += direction[1]  # Horizontal movement
+
+            if chessboard[row][column] != 0:  # Found piece
+                
+                if is_enemy(is_white, chessboard[row][column]) and chessboard[row][column].upper() == "N": # Enemy knight -> Checkmate
+                    return True
+  
+
+
+    #
+    # Check for pawns 
+    #
+
+
+    if is_white:
+        front_row = king_field[0] - 1
+        column = king_field[1]
+        enemy_pawn = "p"
+    else:
+        front_row = king_field[0] + 1
+        column = king_field[1]
+        enemy_pawn = "P"
+
+
+        for direction in [1, -1]:
+
+            if in_bound(front_row, column + direction) and chessboard[front_row][column + direction] == enemy_pawn:
+                return True
+            
+
+
+    #
+    # Check for king 
+    #
+
+    king_row = king_field[0]
+    king_column = king_field[1]
+
+    enemy_king = "k" if is_white else "K"
+
+
+    for vertical_direction in [1, 0, -1]:
+
+        for horizontal_direction in [1, 0 , -1]:
+
+            if in_bound(king_row + vertical_direction, king_column + horizontal_direction) and chessboard[king_row + vertical_direction][king_column + horizontal_direction] == enemy_king:
+                return True      
+
+
+
+    return False # No Checkmate found 
+
+
+    
 
 # Check if the game is over (checkmate or stalemate)
 def game_over(chessboard_object, is_white):
