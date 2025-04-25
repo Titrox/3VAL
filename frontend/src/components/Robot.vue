@@ -84,8 +84,6 @@ function updateRobot(deltaValue, turnNumber, playerColor) {
   // Get updated robot emotion
   emotion = getRobotEmotion(deltaValue, playerColor);
 
-  console.log(emotion)
-  console.log(lastEmotion)
 
   if (turnNumber < 3) { // For the first few moves of the engine.
 
@@ -104,14 +102,15 @@ function updateRobot(deltaValue, turnNumber, playerColor) {
     lastEmotion = emotion;
     message.value = robotText[emotion][Math.floor(Math.random() * robotText[emotion].length)];
     robotImage.value = getRobotImage(emotion)
+
     playSpeechSound()
 
-  } else if (emotion === lastEmotion) { // Random fun-fact if robots emotion have not changed for 4 engine moves
+  } else if (emotion === lastEmotion) { // Random fun-fact if robots emotion have not changed for 6 engine moves
 
     sameEmotionCount++
     console.log(`Same Emotion + ${sameEmotionCount}`)
 
-    if (sameEmotionCount > 4 && turnNumber >= 10) {
+    if (sameEmotionCount > 5 && turnNumber >= 10) {
       message.value = robotText["fun_facts"][Math.floor(Math.random() * robotText["fun_facts"].length)];
       emotion = "happy"
       robotImage.value = getRobotImage("happy")

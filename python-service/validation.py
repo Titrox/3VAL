@@ -867,6 +867,7 @@ def is_check(chessboard, is_white):
     # Check for king 
     #
 
+
     king_row = king_field[0]
     king_column = king_field[1]
 
@@ -956,6 +957,7 @@ def evaluate_position(chessboard):  # pragma: no cover
         for j in range (8):
 
             piece = chessboard[i][j]
+
 
             #
             # PSQT VALUE
