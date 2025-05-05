@@ -81,6 +81,11 @@ function getRobotEmotion(deltaValue, playerColor) {
 // TODO Refactor
 function updateRobot(deltaValue, turnNumber, playerColor) {
 
+
+
+  console.log(deltaValue)
+
+
   // Get updated robot emotion
   emotion = getRobotEmotion(deltaValue, playerColor);
 
